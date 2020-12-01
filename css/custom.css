@@ -94,6 +94,9 @@ li.hope {
 .title {
 	color: white;
 
+	/*filter: blur(8px);*/
+  	/*-webkit-filter: blur(8px);*/
+
     /*-webkit-border-radius: 20px;*/
     /*-moz-border-radius: 20px;*/
     /*border-radius: 20px;*/
