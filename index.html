@@ -1,0 +1,995 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>Safe and Efficient Reinforcement Learning for Behavioural Planning in Autonomous Driving</title>
+
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/black.css" id="theme">
+	<link rel="stylesheet" href="css/custom.css">
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+
+
+</head>
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section class="title" data-background-video="videos/traffic_blur.mp4" data-background-video-loop data-background-video-muted>
+				<h4><span>Safe</span> and <span>Efficient</span> <br>Reinforcement Learning<br>for Behavioural Planning <br>in Autonomous Driving</h4>
+				<p class="authors">
+					<medium><a href="http://edouardleurent.com">Edouard Leurent</a></medium>
+				</p>
+				<p class="authors"><small>Supervised by<br><a href="http://odalricambrymmaillard.neowordpress.fr/">Odalric-Ambrym Maillard</a>, <a href="http://researchers.lille.inria.fr/~efimov/">Denis Efimov</a>,<br><a href="http://researchers.lille.inria.fr/%7Eperruque/">Wilfrid Perruquetti</a>, <a href="https://fr.linkedin.com/in/yann-blanco-1038a717">Yann Blanco</a></small>
+				</p>
+				<p>Friday, October 30<sup>th</sup>, 2020</p>
+				<footer>
+					<img data-src="images/univ.png" height="50">
+					<img data-src="images/inria.png" height="50">
+					<img data-src="images/cnrs.png" height="50">
+					<img data-src="images/centrale.png" height="50">
+					<img data-src="images/cristal.svg" height="50">
+					<img data-src="images/renault.png" height="50">
+				</footer>
+			</section>
+
+
+			<section>
+				<section>
+					<header><h3>Introduction</h3></header>
+				</section>
+ 				<!--<section data-background-image="images/introduction/tcr.jpg">
+					<h3 style="text-shadow: 0px 2px 3px #000;">Renault ADAS Department</h3>
+				</section>-->
+ 				<section>
+					<header><h3>Motivation</h3></header>
+					<div class="r-stack">
+					<figure class="fragment fade-in-then-out" data-fragment-index="0">
+						<img data-src="images/introduction/tcr.jpg" width="100%">
+						<figcaption>ADAS Department, Renault, Guyancourt</figcaption>
+					</figure>
+					<figure class="fragment fade-in-then-out" data-fragment-index="1">
+						<video data-autoplay muted loop data-src="videos/introduction/acc.mp4" type="video/mp4"></video>
+						<figcaption>Adaptive Cruise Control (ACC)</figcaption>
+					</figure>
+					<figure class="fragment fade-in-then-out" data-fragment-index="2">
+						<video data-autoplay muted loop data-src="videos/introduction/aeb.mp4" type="video/mp4"></video>
+						<figcaption>Automatic Emergency Braking (AEB)</figcaption>
+					</figure>
+					<figure class="fragment fade-in-then-out" data-fragment-index="3">
+						<video data-autoplay muted loop data-src="videos/introduction/lka.mp4" type="video/mp4"></video>
+						<figcaption>Lane Keeping Assist (LKA)</figcaption>
+					</figure>
+				</div>
+				</section>
+				<section>
+					<header><h3>Failure modes</h3></header>
+					<video data-autoplay muted loop data-src="videos/introduction/merge.mp4" type="video/mp4"></video>
+					<p>Insertion lane</p>
+				</section>
+				<section>
+					<header><h3>Failure modes</h3></header>
+					<video data-autoplay muted loop data-src="videos/introduction/waymo.mp4" type="video/mp4"></video>
+				</section>
+				<section>
+					<header><h3>Failure modes</h3></header>
+					<video data-autoplay muted loop data-src="videos/introduction/navya_small.mp4" type="video/mp4"></video>
+				</section>
+				<section>
+					<header><h3>Interacting with a <span class="red">human</span></h3></header>
+					<br>
+					<ul>
+						<li class="fragment">Under <span class="green">perfect perception & control</span>,</li>
+						<li class="fragment">Human behaviours are <span class="red">unknown</span>.</li>
+					</ul>
+				</section>
+				<section>
+					<header><h3>Research questions</h3></header>
+					<br>
+					<ul>
+						<li class="fragment">How to <span class="green">smoothly</span> interact with other agents?</li>
+						<li class="fragment">Can we guarantee <span class="red">safety</span> under uncertainty?</li>
+					</ul>
+				</section>
+				<section>
+					<header>
+						<h3 style="display:inline-block;">Benchmark: <a href="http://github.com/eleurent/highway-env">highway-env</a></h3>
+						<div style="display:inline-block;">
+							<a class="github-button" href="https://github.com/eleurent/highway-env" data-color-scheme="no-preference: dark; light: dark; dark: dark;" data-icon="octicon-star" data-show-count="true" aria-label="Star eleurent/highway-env on GitHub">Star</a>
+							<a class="github-button" href="https://github.com/eleurent/highway-env/fork" data-color-scheme="no-preference: dark; light: dark; dark: dark;" data-icon="octicon-repo-forked" data-show-count="true" aria-label="Fork eleurent/highway-env on GitHub">Fork</a>
+						</div>
+					</header>
+						<div class="container">
+						<div class="col">
+							<img data-src="videos/highway-env/highway.gif" width="100%">
+							<img data-src="videos/highway-env/roundabout-env.gif" width="80%">
+							<img data-src="videos/highway-env/merge-env.gif" width="100%">
+						</div>
+
+						<div class="col">
+							<img data-src="videos/highway-env/intersection-env.gif" width="70%">
+							<img data-src="videos/highway-env/parking-env.gif" width="70%">
+						</div>
+					</div>
+				</section>
+				<section>
+					<header><h3>Outline</h3></header>
+					<ul>
+						<li class="fragment" data-fragment-index="0">Model-based
+							<ol>
+								<li class="fragment fade-in-then-semi-out" data-fragment-index="3"><a href="#/planning">Planning Fast</a></li>
+								<li class="fragment" data-fragment-index="4"><a href="#/preparing-worst">Preparing for the Worst</a></li>
+							</ol>
+						</li>
+						<li class="fragment" data-fragment-index="1">Model-free
+							<ol>
+								<li class="fragment" data-fragment-index="5"><a href="#/social-interactions">Considering Social Interactions</a></li>
+								<li class="fragment" data-fragment-index="6"><a href="#/acting-constraints">Acting under Adjustable Constraints</a></li>
+							</ol>
+						</li>
+					</ul>
+				</section>
+			</section>
+
+
+			<section>
+				<section id="planning">
+					<h2 style="color:grey">Model-based</h2><br>
+					<h4><ol><li style="color:grey">Planning fast</li></ol></h4>
+					<br>
+					<ul style="margin:0;">
+						<li style="color:grey; display: inline;"><a href="https://eleurent.github.io/kl-olop/">(ECML 2019)</a>, </li>
+						<li style="color:grey; display: inline;"><a href="http://www.edouardleurent.com/publication/graph-search/mcgs.pdf">(ACML 2020)</a></li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<section id="preparing-worst">
+					<h2>Model-based</h2><br>
+					<h4><ol start="2"><li>Preparing for the Worst</li></ol></h4>
+					<br>
+					<ul style="margin:0;">
+						<li style="display: inline;"><a href="https://eleurent.github.io/interval-prediction/">(CDC 2019)</a>, </li>
+						<li style="display: inline;"><a href="https://arxiv.org/abs/2007.10401/">(CDC 2020)</a>, </li>
+						<li style="display: inline;"><a href="https://eleurent.github.io/robust-beyond-quadratic/">(NeurIPS 2020)</a></li>
+					</ul>
+				</section>
+				<section>
+					<header><h3>Principle</h3></header>
+					<p>$$\dot{x}(t) = \color{lightskyblue}{f}(\overset{state}{x(t)}, \overset{action}{u(t)}) + \overset{disturbance}{\omega(t)}$$</p>
+					<ol style="list-style-type: none;">
+						<li class="fragment" data-fragment-index="1">1. Learn a model of the dynamics <br><p align="center">$\min_{\color{orange}{\theta}} \mathcal{L}(\color{orange}{f_{\theta}}, \color{lightskyblue}{f})$</p></li>
+						<li class="fragment" data-fragment-index="0">
+								<div class="r-stack">
+									<p class="fragment fade-in-then-semi-out" data-fragment-index="0"><span class="fragment fade-out" data-fragment-index="2">We want $$\max_{\color{limegreen}{\pi}} \expectedvalue\left[ \sum_{t}\gamma^t \overset{reward}{R(x(t))}\middle| \color{lightskyblue}{f}, \color{limegreen}{\overset{policy}{\pi}} \right]$$</span></p>
+									<p class="fragment fade-in-then-out" data-fragment-index="2">2. Use it to plan $$\max_{\color{limegreen}{\pi}} \expectedvalue\left[ \sum_{t}\gamma^t \overset{reward}{R(x(t))}\middle| \color{orange}{f_{\theta}}, \color{limegreen}{\overset{policy}{\pi}} \right]$$</p>
+							</div>
+						</li>
+					</ol>
+				</section>
+				<section>
+					<header><h3>Limitation</h3></header>
+					<p><span class="red">Ignores</span> the model bias$$\color{orange}{f_{\theta}} \neq \color{lightskyblue}{f}$$</p>
+					<p>
+						<ul>
+							<li class="fragment hope">But it might get better as $\color{orange}{f_{\theta}} \to \color{lightskyblue}{f}$ ?</li>
+							<li class="fragment cross"><span class="red">No:</span> constrained optimization <img class="fragment" style="vertical-align:middle" data-src="images/robust/lp.svg"></li>
+						</ul>
+					</p>
+				</section>
+				<section>
+					<header><h3>Constrained optimization</h3></header>
+					<p>with oracle $\color{lightskyblue}{f}$</p>
+					<video data-autoplay muted loop data-src="videos/robust/oracle.mp4" type="video/mp4"></video>
+				</section>
+				<section>
+					<header><h3>Model Bias</h3></header>
+					<p>with model $\color{orange}{f_{\theta}}$</p>
+					<video data-autoplay muted loop data-src="videos/robust/model-bias.mp4" type="video/mp4"></video>
+				</section>
+				<section>
+					<header><h3>How to tackle model bias?</h3></header>
+					<ol>
+						<li class="fragment"> Build a confidence <strong>region</strong> $\color{crimson}{\mathcal{C}_{N,\delta}}$ for the dynamics
+							\[\mathbb{P}\left[\color{orange}{\theta}\in\color{crimson}{\mathcal{C}_{N,\delta}}\right]\geq 1-\delta\]
+						</li>
+						<li class="fragment"> Plan <strong>robustly</strong> against the worst case outcome
+							\[\color{limegreen}{\sup_{u}} \underbrace{\color{crimson}{\inf_{\substack{\theta \in \mathcal{C}_{N,\delta}\\ \omega\in[\underline\omega,\overline\omega]}}} \expectedvalue \left[\sum_{n=0}^\infty \gamma^n R(x(t_n)) \middle| \color{limegreen}{u}, \color{crimson}{f_{\theta}}, \color{crimson}{\omega}\right]}_{\color{crimson}{V^r(u)}}\]
+						</li>
+					</ol>
+				</section>
+				<section style="font-size: 80%">
+					<header><h3>Confident regression</h3></header>
+					<div class="container">
+						<div style="flex: 2;">
+							<p class="fragment" align="left"> Assume $\color{orange}{f_\theta}$ is <strong>linearly</strong> parametrized</p>
+							<p class="fragment">$\small \color{orange}{f_\theta}(x, u) = \phi_0(x, u) + \sum_{i=1}^d \color{orange}{\theta_i}\phi_i(x, u)\in\Real^p$</p>
+							<p class="theorem fragment" align="left"> <strong>Proposition</strong> (Confidence ellipsoid $\color{crimson}{\cC_{N,\delta}}$ from <a href="https://papers.nips.cc/paper/4417-improved-algorithms-for-linear-stochastic-bandits">Abbasi-Yadkori <em>et al.</em>, 2011</a>)
+								\[\small \mathbb{P}\left[\|\color{orange}{\theta}-\color{crimson}{\theta_{N,\lambda}}\|_{\color{crimson}{G_{N,\lambda}}} \leq \color{crimson}{\beta_N(\delta)}\right]\geq 1-\delta\]
+								<!-- $
+								\scriptsize
+								\begin{aligned}
+								\theta_{N,\lambda} & = G_{N, \lambda}^{-1} \sum_{n=1}^N \Phi_n^\top \Sigma_p^{-1} y_n,\\
+								G_{N, \lambda} &= \sum_{n=1}^N \Phi_{n}^\top\Sigma_p^{-1}\Phi_{n}  + \lambda I_d
+								\end{aligned}
+								$ -->
+							</p>
+						</div>
+						<div class="col" style="align-items: center;align-self: center;">
+							<div class="r-stack">
+								<img class="fragment fade-in-then-out" data-src="images/robust/ellipsoid_0.svg" width=100%>
+								<img class="fragment fade-in-then-out" data-src="images/robust/ellipsoid_1.svg" width=100%>
+								<img class="fragment fade-in-then-out" data-src="images/robust/ellipsoid_2.svg" width=100%>
+								<img class="fragment fade-in-then-out" data-src="images/robust/ellipsoid_3.svg" width=100%>
+							</div>
+						</div>
+					</div>
+				</section>
+				<section>
+					<header><h3>Robust planning</h3></header>
+					<p>How to optimize the minimax objective?
+						\[\color{limegreen}{\sup_{u}} {\color{crimson}{\inf_{\substack{\theta \in \mathcal{C}_{N,\delta}\\ \omega\in[\underline\omega,\overline\omega]}}} \expectedvalue \left[\sum_{n=0}^\infty \gamma^n R(x(t_n)) \middle| \color{limegreen}{u}, \color{crimson}{f_{\theta}}, \color{crimson}{\omega}\right]}\]
+					</p>
+					<p class="fragment" align="left">Related work</p>
+					<ul>
+						<li class="fragment cross">Robust Dynamic Programming <a href="https://pubsonline.informs.org/doi/abs/10.1287/moor.1040.0129">(Iyengar, 2005)</a> <span class="fragment red"><br>⮕ finite $\mathcal{S}$</span></li>
+						<li class="fragment check">Linear Quadratic Setting <span class="fragment green">⮕ continuous $\mathcal{S}$</span></li>
+					</ul>
+				</section>
+				<section>
+					<header><h3>Linear Quadratic Systems</h3></header>
+					<div class="container">
+						<div class="col">
+							<br>
+							<p>
+								<span class="fragment" data-fragment-index="0">$f(x, u) = Ax + Bu$</span>
+								<span class="fragment" data-fragment-index="1"><span class="fragment highlight-red" data-fragment-index="3">$R(x, u) = -x^\top Qx - u^\top R u$</span></span>
+							</p>
+							<p class="fragment" data-fragment-index="2" align="center"><a href="https://arxiv.org/abs/1710.01688">(Dean <em>et al.</em>, 2018)</a><br>cast <span class="green">$\max$</span> <span class="red">$\min$</span> as an <span class="blue">SDP</span></p>
+						</div>
+						<div class="col fragment" data-fragment-index="3">
+							<figure>
+								<img data-src="images/robust/quadratic_w.png" width="55%">
+								<figcaption>❌<span class="red">stabilization</span> only</figcaption>
+							</figure>
+						</div>
+					</div>
+				</section>
+				<section>
+					<header><h3>Obstacle avoidance tasks</h3></header>
+					<div class="r-stack">
+					<img class="fragment fade-in-then-out" data-src="images/robust/non-convex_0.svg" width="75%">
+					<img class="fragment" data-src="images/robust/non-convex.svg" width="75%">
+					</div>
+					<li class="fragment fade-up warning">Handle <span class="red">non-convex</span>, <span class="red">non-smooth</span> rewards</p>
+				</section>
+				<section>
+					<header><h3>Tree-based planning</h3></header>
+					<div class="r-stack">
+						<img class="fragment fade-in-then-semi-out" data-fragment-index="0" data-src="images/robust/planning.svg">
+						<img class="fragment" data-fragment-index="2" data-src="images/robust/planning1.svg">
+					</div>
+					<ul>
+						<li class="fragment check" data-fragment-index="0"><span class="green">No assumption</span> on dynamics $f$ or reward $R$</li>
+						<li class="fragment cross" data-fragment-index="1">Handle a <span class="red">single</span> known dynamics</li>
+						<li class="fragment imply" data-fragment-index="2">Bound the set of <strong>reachable</strong> states under $\color{orange}{\theta\in\cC_{N,\delta}}$</li>
+					</ul>
+				</section>
+				<section>
+					<header><h3>Interval Prediction</h3></header>
+					<div class="container">
+						<div style="flex: 2;">
+							<p style="font-size: 80%">
+								<span class="fragment" data-fragment-index="0">
+								Propagate uncertainty $\color{crimson}{\theta\in\cC_{N,\delta}}$ through time and bound the reachable states
+								</span>
+								<span class="fragment" data-fragment-index="4">
+								\[\color{lightskyblue}{\underline x(t)} \leq x(t) \leq \color{lightskyblue}{\overline x(t)}\]
+								</span>
+							</p>
+						</div>
+						<div class="col r-stack">
+							<img class="fragment"  data-fragment-index="3" data-src="images/robust/interval-hull_3.svg" width=100%>
+							<img class="fragment"  data-fragment-index="0" data-src="images/robust/interval-hull_0.svg" width=100%>
+							<img class="fragment"  data-fragment-index="1" data-src="images/robust/interval-hull_1.svg" width=100%>
+							<img class="fragment"  data-fragment-index="2" data-src="images/robust/interval-hull_2.svg" width=100%>
+							<img class="fragment"  data-fragment-index="4" data-src="images/robust/interval-hull_4.svg" width=100%>
+						</div>
+					</div>
+				</section>
+				<section>
+					<header><h3>Interval Prediction</h3></header>
+					<div class="fragment"><p><span class="red">Challenge</span></p><p>Propagate uncertainty from $x(t)$ to $x(t+dt)$</p>
+					</div>
+					<div class="fragment">
+					<p><strong>Assumption</strong></p>
+					<p align="left"> $f$ depends linearly on <span class="blue">$x$</span></p>
+					<p>
+						<span>
+						$\dot{{x}}(t) = \color{orange}{A(\theta)}\color{\lightskyblue}{x(t)} + Bu(t) + D\omega(t),$</span><br><span class="fragment">
+						where $~\color{orange}{A(\theta)}  = A_0 + \sum_{i=1}^d\color{orange}{\theta_i}\phi_i$
+					</p>
+					</div>
+				</section>
+				<section style="font-size: .7em;">
+					<header><h3>Solution 1: interval arithmetic</h3></header>
+					<p class="theorem" align="left"><strong>Lemma</strong> <a href="https://hal.inria.fr/hal-00701643">(Efimov <em>et al.</em>, 2012)</a><br>Given $\color{crimson}{\underline{A}\leq A(\theta)\leq\overline{A}}$ and $\color{lightskyblue}{\underline{x}(t)\leq x(t)\leq \overline{x}(t)}$,
+						<span class="fragment">
+							\[
+							\scriptsize
+							\begin{aligned}
+							\dot{\underline{x}}(t) = \color{crimson}{\underline{A}^{+}}\color{lightskyblue}{\underline{x}^{+}(t)} - \color{crimson}{\overline{A}^{+}}\color{lightskyblue}{\underline{x}^{-}(t)} - \color{crimson}{\underline{A}^{-}}\color{lightskyblue}{\overline{x}^{+}(t)} + \color{crimson}{\overline{A}^{-}}\color{lightskyblue}{\overline{x}^{-}(t)} +Bu(t) + D^{+}\underline{\omega}(t)-D^{-}\overline{\omega}(t),\\
+							\dot{\overline{x}}(t) = \color{crimson}{\overline{A}^{+}}\color{lightskyblue}{\overline{x}^{+}(t)} - \color{crimson}{\underline{A}^{+}}\color{lightskyblue}{\overline{x}^{-}(t)} - \color{crimson}{\overline{A}^{-}}\color{lightskyblue}{\underline{x}^{+}(t)} + \color{crimson}{\underline{A}^{-}}\color{lightskyblue}{\underline{x}^{-}(t)} +Bu(t) + D^{+}\overline{\omega}(t)-D^{-}\underline{\omega}(t),
+							\end{aligned}
+							\]
+						</span>
+						<span class="fragment">ensures the inclusion property.</span>
+					</p>
+				</section>
+				<section>
+					<header><h3>But is it stable?</h3></header>
+					<p>$\dot x(t) = -\color{orange}{\theta} x(t) + \omega(t),
+						\quad\left\{\begin{array}{l}
+						\small \color{orange}{\theta\in[1, 2]}\\
+						\small\omega(t) \in [-0.05, 0.05]
+					\end{array}\right.$</p>
+					<img class="fragment" data-src="images/robust/observer_dark.svg" width="70%"></object>
+				</section>
+				<section style="font-size: .7em">
+					<header><h3>Novel predictor</h3></header>
+					<p align="left">Under polytopic uncertainty around <span class="orange">$A_0$ Metzler</span> \[A(\theta) = \color{orange}{A_0} + \sum_i\alpha_i\color{crimson}{\Delta A_i},\]</p>
+					<p class="fragment theorem" align="left"> <strong>Theorem <a href="https://eleurent.github.io/interval-prediction/">(CDC 2019)</a></strong> The predictor
+						\[
+						\scriptsize
+						\begin{aligned}
+						\dot{\underline{x}}(t) & = \color{orange}{A_{0}}\underline{x}(t)-\color{crimson}{\Delta A_{+}}\underline{x}^{-}(t)-\color{crimson}{\Delta A_{-}}\overline{x}^{+}(t) +Bu(t)+D^{+}\underline{\omega}(t)-D^{-}\overline{\omega}(t),\\
+						\dot{\overline{x}}(t) & = \color{orange}{A_{0}}\overline{x}(t)+\color{crimson}{\Delta A_{+}}\overline{x}^{+}(t)+\color{crimson}{\Delta A_{-}}\underline{x}^{-}(t) +Bu(t)+D^{+}\overline{\omega}(t)-D^{-}\underline{\omega}(t), \\
+						\end{aligned}
+						\]
+					ensures the inclusion property.</p>
+				</section>
+				<section style="font-size: .7em">
+					<header><h3>Novel predictor: stability</h3></header>
+					Let $\mathcal{A}=\left[\begin{array}{cc}
+							\color{orange}{A_{0}} & 0\\
+							0 & \color{orange}{A_{0}}
+							\end{array}\right],\;R_{+}=\left[\begin{array}{cc}
+							0 & -\color{crimson}{\Delta A_{-}}\\
+							0 & \color{crimson}{\Delta A_{+}}
+							\end{array}\right],\;R_{-}=\left[\begin{array}{cc}
+							\color{crimson}{\Delta A_{+}} & 0\\
+							-\color{crimson}{\Delta A_{-}} & 0
+							\end{array}\right]$
+					<p class="theorem" align="left"><strong>Theorem <a href="https://eleurent.github.io/interval-prediction/">(CDC 2019)</a></strong> If there exist diagonal matrices $P$, $Q$, $Q_{+}$, $Q_{-}$, $Z_{+}$, $Z_{-}$, $\Psi_{+}$, $\Psi_{-}$, $\Psi$, $\Gamma\in\Real^{2n\times2n}$ such that
+						<span class="fragment">
+							\[
+							\begin{aligned}
+							\color{lightskyblue}{\Upsilon\preceq0},\;P+\min\{Z_{+},Z_{-}\}>0,\;\Gamma>0,\\
+							Q+\min\{Q_{+},Q_{-}\}+2\min\{\Psi_{+},\Psi_{-}\}>0,
+							\end{aligned}
+							\]
+						</span>
+						<span class="fragment">
+							where
+							\[
+							\color{lightskyblue}{\Upsilon_{11}}=\mathcal{A}^{\top}P+P\mathcal{A}+Q,\;\color{lightskyblue}{\Upsilon_{12}}=\mathcal{A}^{\top}Z_{+}+PR_{+}+\Psi_{+},\\
+							\color{lightskyblue}{\Upsilon_{13}}=\mathcal{A}^{\top}Z_{-}+PR_{-}+\Psi_{-},\;\color{lightskyblue}{\Upsilon_{22}}=Z_{+}R_{+}+R_{+}^{\top}Z_{+}+Q_{+},\\
+							\color{lightskyblue}{\Upsilon_{23}}=Z_{+}R_{-}+R_{+}^{\top}Z_{-}+\Psi,\;\color{lightskyblue}{\Upsilon_{33}}=Z_{-}R_{-}+R_{-}^{\top}Z_{-}+Q_{-}
+							\]
+						</span>
+						<span class="fragment">
+							then the predictor is <strong>input-to-state stable</strong> with the disturbance $\underline{\omega}$, $\overline{\omega}$.
+						</span>
+					</p>
+				</section>
+				<section>
+					<header><h3>Novel predictor: stability</h3></header>
+					<img class="fragment" data-src="images/robust/predictor_dark.svg" width="75%"></object>
+				</section>
+				<section>
+					<header><h3>Prediction for a car</h3></header>
+					<figure>
+						<img data-src="videos/interval/interval_direct.gif" width="60%">
+						<figcaption>Simple predictor</figcaption>
+					</figure>
+					<figure>
+						<img data-src="videos/interval/interval_novel.gif" width="60%">
+						<figcaption>Enhanced predictor</figcaption>
+					</figure>
+				</section>
+				<section>
+					<header><h3>Scalability</h3></header>
+					<figure>
+						<img data-src="videos/interval/traffic.gif" width="100%">
+						<figcaption>Complexity <span class="fragment barred" data-fragment-index="0">$\mathcal{O}(H\color{crimson}{p^2})$</span><span style="display:inline-block;" class="fragment fade-left" data-fragment-index="0">$\rightarrow\mathcal{O}(H\color{limegreen}{p})$</span></figcaption>
+					</figure>
+				</section>
+				<section>
+					<header><h3>Minimax control</h3></header>
+					<p>Use the predicted <strong>intervals</strong> in a <span class="orange">surrogate</span> objective
+						\[\small
+						\color{orange}{\hat{V}^r(u)} = \sum_{n=N+1}^\infty \gamma^n \color{orange}{\min_{\color{lightskyblue}{\underline{x}(t_n)}\leq x \leq\color{lightskyblue}{\overline{x}(t_n)}}  R(x)}
+						\]
+					</p>
+					<img class="fragment" data-src="images/robust/planning2.svg" width=30%>
+				</section>
+				<section>
+					<header><h3>Results</h3></header>
+					<div class="theorem fragment"><strong>Theorem <a href="https://eleurent.github.io/robust-beyond-quadratic/">(NeurIPS 2020)</a></strong>
+						<p>
+						$
+						\color{orange}{\underbrace{\hat{V}^r(u)}_{\substack{\text{surrogate}\\\text{value}}}}
+						\leq
+						\color{crimson}{\underbrace{{V}^r(u)}_{\substack{\text{robust}\\\text{value}}}}$
+						<span class="fragment">
+							$\leq
+							\color{limegreen}{\underbrace{{V}(u)}_{\substack{\text{true}\\\text{performance}}}}$
+						</span>
+						</p>
+					</div>
+				</section>
+				<section style="font-size: .7em">
+					<header><h3>Bounded suboptimality</h3></header>
+					<div class="theorem">
+						<p align="left"><strong>Theorem <a href="https://eleurent.github.io/robust-beyond-quadratic/">(NeurIPS 2020)</a></strong> Under two conditions:
+							<ol>
+								<li class="fragment">Lipschitz reward $R$;</li>
+								<li class="fragment">Stability condition: there exist $P>0,\,Q_0,\,\rho,\,N_0$ such that
+									\[\forall \color{orange}{N}>N_0,\quad\begin{bmatrix}
+									\color{orange}{A(\theta_N)}^\top P + P \color{orange}{A(\theta_N)} + Q_0 & P|D|  \\
+									|D|^\top P & -\rho I_r \\
+									\end{bmatrix}< 0;\]
+								</li>
+							</ol>
+						</p>
+						<p align="left" class="fragment">
+							with probability $1-\delta$,
+							\[
+							\underbrace{V(a_\star) - V(a_K)}_{\substack{\text{subptimality}}} \leq
+							\color{crimson}{\underbrace{\Delta_\omega}_{\substack{\text{robustness to}\\ \text{disturbances}}}} + \color{lightskyblue}{\underbrace{\mathcal{O}\left(\frac{\beta_N(\delta)^2}{\lambda_{\min}(G_{N,\lambda})}\right)}_{\text{estimation error}}} +
+							\color{limegreen}{\underbrace{\mathcal{O}\left(K^{-\frac{\log 1/\gamma}{\log \kappa}}\right)}_{\text{planning error}}}
+							\]
+						</p>
+					</div>
+				</section>
+				<section style="font-size: .7em">
+					<header><h3>Asymptotic Near-optimality</h3></header>
+					<div class="theorem">
+						<p align="left"><strong>Corollary <a href="https://eleurent.github.io/robust-beyond-quadratic/">(NeurIPS 2020)</a></strong> Under an additional <strong>persistent excitation</strong> (PE) assumption:
+							\[\exists \underline{\phi},\overline{\phi}>0: \forall n\geq n_0,\quad \underline{\phi}^2 \leq \lambda_{\min}(\Phi_{n}^\top\Sigma_{p}^{-1}\Phi_{n}) \leq \overline{\phi}^2,\]
+							<span class="fragment" data-fragment-index="1">
+								the stability condition 2. can be relaxed to the true system:
+								$$\begin{bmatrix}
+								\color{orange}{A(\theta)}^\top P + P \color{orange}{A(\theta)} + Q_0 & P|D|  \\
+								|D|^\top P & -\rho I_r \\
+								\end{bmatrix}< 0;$$
+							</span>
+							<span class="fragment" data-fragment-index="2">
+								and the bound takes the more explicit form
+							</span>
+						</p>
+						<p class="fragment" data-fragment-index="2">
+							${V(a_\star)} - {V(a_K)} \leq
+							\color{crimson}{\Delta_\omega} +$
+							<span class="fragment shrink tiny" data-fragment-index="3">$\color{lightskyblue}{{\mathcal{O}\left(\frac{\log\left(N^{d/2}/\delta\right)}{N}\right)}}$</span>$ + $
+							<span class="fragment shrink tiny" data-fragment-index="4">$\color{limegreen}{{\mathcal{O}\left(K^{-\frac{\log 1/\gamma}{\log \kappa}}\right)}}$</span>
+						</p>
+					</div>
+				</section>
+				<section>
+					<header><h3>Experiment: obstacle avoidance</h3></header>
+					<figure>
+						<video data-autoplay muted loop data-src="videos/robust/1_oracle.mp4" type="video/mp4"></video>
+						<figcaption>Oracle dynamics $\color{orange}{A(\theta)}$</figcaption>
+					</figure>
+				</section>
+				<section>
+					<header><h3>Experiment: obstacle avoidance</h3></header>
+					<figure>
+						<video data-autoplay muted loop data-src="videos/robust/1_plan_nominal.mp4" type="video/mp4"></video>
+						<figcaption>Estimated dynamics $\color{lightskyblue}{A(\hat{\theta}_{N,\lambda})}$</figcaption>
+					</figure>
+				</section>
+				<section>
+					<header><h3>Experiment: obstacle avoidance</h3></header>
+					<figure>
+						<video data-autoplay muted loop data-src="videos/robust/1_robust.mp4" type="video/mp4"></video>
+						<figcaption>Robust planning with $\color{crimson}{\cC_{N,\delta}}$</figcaption>
+					</figure>
+				</section>
+				<section>
+					<header><h3>Results</h3></header>
+					<table>
+						<thead>
+							<tr>
+								<th>Performance</th>
+								<th>failures</th>
+								<th>min</th>
+								<th>avg $\pm$ std</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Oracle</td>
+								<td>$0\%$</td>
+								<td>$11.6$</td>
+								<td>$14.2 \pm 1.3$</td>
+							</tr>
+							<tr>
+								<td>Nominal</td>
+								<td>$4\%$</td>
+								<td>$2.8$</td>
+								<td><span class="fragment highlight-blue" data-fragment-index="1">$13.8 \pm 2.0$</span></td>
+							</tr>
+							<tr>
+								<td>DQN (trained)</td>
+								<td>$6\%$</td>
+								<td>$1.7$</td>
+								<td>$12.3 \pm 2.5$</td>
+							</tr>
+							<tr>
+								<td>Robust</td>
+								<td><span class="fragment highlight-blue" data-fragment-index="0">$0\%$</span></td>
+								<td><span class="fragment highlight-blue" data-fragment-index="0">$10.4$</span></td>
+								<td>$13.0 \pm 1.5$</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+				<section>
+					<header><h3>What if our assumptions are wrong?</h3></header>
+					<p class="fragment">$$\dot{{x}}(t) = \left(\color{magenta}{A_0} + \sum_{i=1}^d{\theta_i}\color{magenta}{\phi_i}\right)x(t) + Bu(t) + D\omega(t)$$</p>
+					<p class="fragment">Our <strong>statistical framework</strong> can test the <strong>adequacy</strong> <span class="fragment">of the model $\color{magenta}{(A_0,\phi)}$</span> <span class="fragment">with observations $x(t_0)$, $x(t_1),\dots$</span>
+					</p>
+				</section>
+				<section style="font-size: 90%;">
+					<header><h3>Multi-model extension</h3></header>
+					<div class="container">
+						<div class="col">
+					<p>Use <strong>multiple</strong> models $\color{magenta}{(A_0^{(i)},\phi^{(i)})}$</p>
+							<ul>
+								<li class="fragment" data-fragment-index="0"><strong>Maintain</strong> the set of valid models</li>
+								<li class="fragment" data-fragment-index="1"><strong>Propagate</strong> all trajectory intervals</li>
+								<li class="fragment" data-fragment-index="2"><strong>Evaluate</strong> the worst-case outcome</li>
+							</ul>
+						</div>
+						<div style="flex: 0.6;" class="r-stack" style="vertical-align: middle;">
+							<img class="fragment fade-in-then-out" data-fragment-index="1" width="300" data-src="images/robust/multi-model.svg">
+							<img class="fragment fade-in-then-out" data-fragment-index="2" width="300" data-src="images/robust/robust-control-tree.svg">
+						</div>
+					</div>
+				</section>
+				<section>
+					<header><h3>Experiment: intersection (1/5)</h3></header>
+					<figure>
+						<video data-autoplay muted loop data-src="videos/robust/v_1_oracle.mp4" type="video/mp4" width="50%"></video>
+						<figcaption>Oracle dynamics $\color{orange}{A(\theta)}$</figcaption>
+					</figure>
+				</section>
+				<section>
+					<header><h3>Experiment: intersection (1/5)</h3></header>
+					<figure>
+						<video data-autoplay muted loop data-src="videos/robust/v_1_robust.mp4" type="video/mp4" width="50%"></video>
+						<figcaption>Robust planning with $\color{crimson}{\cC_{N,\delta}}$</figcaption>
+					</figure>
+				</section>
+				<section>
+					<header><h3>Experiment: intersection (2/5)</h3></header>
+					<figure>
+						<video data-autoplay muted loop data-src="videos/robust/v_10_robust.mp4" type="video/mp4" width="50%"></video>
+						<figcaption>Another example</figcaption>
+					</figure>
+				</section>
+				<section>
+					<header><h3>Experiment: intersection (3/5)</h3></header>
+					<figure>
+						<video data-autoplay muted loop data-src="videos/robust/v_4_robust.mp4" type="video/mp4" width="50%"></video>
+						<figcaption>Conservative on crowded intersections</figcaption>
+					</figure>
+				</section>
+				<section>
+					<header><h3>Experiment: intersection (4/5)</h3></header>
+					<figure>
+						<video data-autoplay muted loop data-src="videos/robust/v_9_robust.mp4" type="video/mp4" width="50%"></video>
+						<figcaption>But still efficient when confident</figcaption>
+					</figure>
+				</section>
+				<section>
+					<header><h3>Experiment: intersection (5/5)</h3></header>
+					<figure>
+						<video data-autoplay muted loop data-src="videos/robust/v_7_robust.mp4" type="video/mp4" width="50%"></video>
+						<figcaption>And at times, even quite aggressive</figcaption>
+					</figure>
+				</section>
+				<section>
+					<header><h3>Results</h3></header>
+					<table>
+						<thead>
+							<tr>
+								<th>Performance</th>
+								<th>failures</th>
+								<th>min</th>
+								<th>avg $\pm$ std</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Oracle</td>
+								<td>$0\%$</td>
+								<td>$6.9$</td>
+								<td>$7.4 \pm 0.5$</td>
+							</tr>
+							<tr>
+								<td>Nominal 1</td>
+								<td>$4\%$</td>
+								<td>$5.2$</td>
+								<td><strong>$7.3 \pm 1.5$</strong></td>
+							</tr>
+							<tr>
+								<td>Nominal 2</td>
+								<td>$33\%$</td>
+								<td>$3.5$</td>
+								<td>$6.4 \pm 0.3$</td>
+							</tr>
+							<tr>
+								<td>DQN (trained)</td>
+								<td>$3\%$</td>
+								<td>$5.4$</td>
+								<td>$6.3 \pm 0.6$</td>
+							</tr>
+							<tr>
+								<td>Robust</td>
+								<td><strong>$0\%$</strong></td>
+								<td><strong>$6.8$</strong></td>
+								<td>$7.1 \pm 0.3$</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+				<section data-background-image="images/robust/road.jpg">
+					<h3 style="color:black">Limitation of the robust approach</h3>
+					<p><br><br><br><br><br><br><br><br><br><br></p>
+				</section>
+				<section>
+					<header><h3>Limitation of the robust approach</h3></header>
+					<img class="flip-vertically" data-src="videos/robust/stuck.gif" width="100%">
+				</section>
+				<section>
+					<header><h3>Contradictory objectives</h3></header>
+					<div class="r-stack">
+					<img data-src="images/budgeted/tradeoff0.svg">
+					<img class="fragment" data-src="images/budgeted/tradeoff1.svg">
+					<img class="fragment" data-src="images/budgeted/tradeoff2.svg">
+					<img class="fragment" data-src="images/budgeted/tradeoff3.svg">
+					</div>
+				</section>
+			</section>
+
+
+
+
+
+			<section>
+				<section id="social-interactions">
+					<h2>Model-free</h2><br>
+					<h4><ol><li>Considering Social Interactions</li></ol></h4>
+					<br>
+					<ul style="margin:0;">
+						<li style="display: inline;"><a href="https://eleurent.github.io/social-attention/">(ML4AD at NeurIPS 2019)</a></li>
+					</ul>
+
+				</section>
+				<section>
+					<header><h3>Q-learning</h3></header>
+					<p class="fragment">\[Q(s,a) = \max_\pi \displaystyle\expectedvalue_{\pi}\left[\sum_{t=0}^\infty \gamma^t R(s_t, a_t) \middle| \substack{s_0=s\\a_0=a}\right]\]</p>
+					<ul>
+						<li class="fragment">Fixed point of the <strong>Bellman operator</strong> $$\mathcal{T}:Q\rightarrow R + \gamma \expectedvalue_P [\max_a Q]$$ </li>
+						<li class="fragment">Fixed-point iteration <strong>guaranteed</strong> to converge, provided sufficient coverage</li>
+					</ul>
+				</section>
+				<section>
+					<header><h3>Function approximation</h3></header>
+					<p align="left" class="fragment">💡 Fit a parametrized model $Q_\theta$</p>
+					<h4 class="fragment">What is a <span class="green">good class of functions</span> for behavioural planning?</h4>
+					<p align="left" class="fragment">Requirements:
+						<ol>
+							<li class="fragment">Represent <strong>any number</strong> of vehicles</li>
+							<li class="fragment"><strong>Invariance</strong> to permutations</li>
+							<li class="fragment"><strong>Low-dimensional</strong> input</li>
+						</ol>
+					</p>
+				</section>
+				<section>
+					<header><h3>Neural Architectures</h3></header>
+					<div class="r-stack">
+						<img class="fragment fade-in-then-out" data-fragment-index="0" data-src="images/social_attention/MLP.svg" height="300">
+						<img class="fragment fade-in-then-out" data-fragment-index="1" data-src="images/social_attention/CNN.svg" height="300">
+						<img class="fragment fade-in-then-out" data-fragment-index="2" data-src="images/social_attention/social_attention.svg" height="300">
+					</div>
+					<table style="font-size: 50%">
+						<thead>
+							<tr>
+								<th></th>
+								<th class="fragment" data-fragment-index="0" align="center">MLP</th>
+								<th class="fragment" data-fragment-index="1" align="center">CNN</th>
+								<th class="fragment" data-fragment-index="2" align="center">Social attention</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr >
+								<td>Variable input</td>
+								<td class="fragment" data-fragment-index="0" align="center">❌</td>
+								<td class="fragment" data-fragment-index="1" align="center">✔️</td>
+								<td class="fragment" data-fragment-index="2" align="center">✔️</td>
+							</tr>
+							<tr>
+								<td>Order invariant</td>
+								<td class="fragment" data-fragment-index="0" align="center">❌</td>
+								<td class="fragment" data-fragment-index="1" align="center">✔️</td>
+								<td class="fragment" data-fragment-index="2" align="center">✔️</td>
+							</tr>
+							<tr>
+								<td>Low-dimensional</td>
+								<td class="fragment" data-fragment-index="0" align="center">✔️</td>
+								<td class="fragment" data-fragment-index="1" align="center">❌</td>
+								<td class="fragment" data-fragment-index="2" align="center">✔️</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+				<section>
+					<header><h3>Results</h3></header>
+					<img data-src="images/social_attention/total_reward.svg" height="100%">
+				</section>
+				<section>
+					<header><h3>Visualization of attention scores</h3></header>
+					<video data-autoplay muted loop controls data-src="videos/attention/1_episode.mp4" type="video/mp4"></video>
+				</section>
+				<section>
+					<header><h3>Sensitivity to distance</h3></header>
+					<video data-autoplay muted loop controls data-src="videos/attention/2_distance.mp4" type="video/mp4"></video>
+				</section>
+				<section>
+					<header><h3>Sensitivity to uncertainty</h3></header>
+					<video data-autoplay muted loop controls data-src="videos/attention/3_sensitivity.mp4" type="video/mp4"></video>
+				</section>
+			</section>
+
+
+
+
+
+			<section>
+				<section id="acting-constraints">
+					<h2>Model-free</h2><br>
+					<h4><ol start="2"><li>Acting under Adjustable Constraints</li></ol></h4>
+					<br>
+					<ul style="margin:0;">
+						<li style="display: inline;"><a href="https://budgeted-rl.github.io/">(NeurIPS 2019)</a></li>
+					</ul>
+
+				</section>
+				<section>
+					<header><h3>Controlling the tradeoff</h3></header>
+					<div class="r-stack">
+						<img class="fragment fade-in-then-out" data-src="images/budgeted/tradeoff.svg">
+						<img class="fragment fade-in-then-out" data-src="images/budgeted/tradeoff-control.svg">
+					</div>
+				</section>
+				<section>
+					<header>
+						<h3><span  style="display: inline-block;" class="fragment fade-down" data-fragment-index="0">Budgeted</span> Markov Decision Process</h3>
+						<p style="margin-top:-20px;" align="right"><a class="fragment" data-fragment-index="0" href="https://static.googleusercontent.com/media/research.google.com/fr//pubs/archive/45291.pdf">(Boutilier <em>et al.</em>, 2016)</a>
+						</p>
+					</header>
+					<ul>
+						<li style="display: inline-block; margin: 10px;">Dynamics $P$,</li>
+						<li style="display: inline-block; margin: 10px;" class="green">Rewards $R$,</li>
+						<li style="display: inline-block; margin: 10px;" class="fragment fade-left red" data-fragment-index="1">Costs $C$,</li>
+						<li style="display: inline-block; margin: 10px;" class="fragment fade-left blue" data-fragment-index="2">Budget $\beta$,</li>
+					</ul>
+					<p>Objective</p>
+					<p><div class="r-stack">
+						<span class="fragment fade-out" data-fragment-index="4">$\max_\pi \,\expectedvalue_\pi\,\color{limegreen}{\sum_t\gamma^t R_t}$</span>
+						<span class="fragment" data-fragment-index="4">$\max_\pi \,\color{limegreen}{V_r^\pi}(s,\color{lightskyblue}{\beta})$</span>
+					</div></p>
+					<p class="fragment fade-up" data-fragment-index="3" style="position:relative;">
+						<span class="fragment fade-out" data-fragment-index="5" style="position:absolute; margin-left: auto; margin-right: auto; left: 0; right: 0;">$\text{subject to }\,\expectedvalue_\pi\,\color{crimson}{\sum_t\gamma^t C_t} \leq \color{lightskyblue}{\beta}$</span>
+						<span class="fragment" data-fragment-index="5" style="position:absolute; margin-left: auto; margin-right: auto; left: 0; right: 0;">$\text{subject to }\,\color{crimson}{V_c^\pi}(s,\color{lightskyblue}{\beta})\leq \color{lightskyblue}{\beta}$</span>
+					</p>
+				</section>
+				<section>
+					<header><h3>Budgeted policies</h3></header>
+					<p style="font-size: 70%">$\overline{Q}^\pi(s, a, $<span class="fragment" data-fragment-index="0">$\color{lightskyblue}{\underbrace{\beta}_{\substack{\text{risk}\\\text{budget}}}}$</span>$) = ($<span class="fragment" data-fragment-index="1">$\color{limegreen}{\underbrace{Q_r^\pi}_{\substack{\text{expected}\\\text{reward}}}}$</span>$,$<span class="fragment" data-fragment-index="2">$\color{crimson}{\underbrace{Q_c^\pi}_{\substack{\text{expected}\\\text{cost}}}}$</span>$)$</p>
+					<img class="fragment" data-fragment-index="3" data-src="images/budgeted/architecture.svg" width=50%>
+				</section>
+				<section style="font-size: 70%">
+					<header><h3>Budgeted Optimality</h3></header>
+					<p class="theorem" align="left"><strong>Theorem <a href="https://budgeted-rl.github.io/">(NeurIPS 2019)</a></strong> The optimal state-action value function verifies
+						\[\color{lightskyblue}{\overline{Q}^\star}(\overline{s},\overline{a}) = \underbrace{\overline{R}(\overline{s}, \overline{a}) + \gamma \sum_{\overline{s}\in\overline{\mathcal{S}}}\overline{P}\left(\overline{s}'\middle| \overline{s},\overline{a}\right) \sum_{\overline{a}\in\overline{\mathcal{A}}} \color{orange}{\pi_{\text{g}}\left(\overline{a}'\middle| \overline{s}';\;\color{lightskyblue}{\overline{Q}^\star}\right)}\color{lightskyblue}{\overline{Q}^\star}(\overline{s}',\overline{a}')}_{\mathcal{T}\color{lightskyblue}{\overline{Q}^\star}(\overline{s},\overline{a})} \]
+						<span class="fragment">where the greedy policy $\color{orange}{\pi_\text{g}}$ is</span>
+						<span class="fragment">\[
+						\begin{aligned}
+						\color{orange}{\pi_\text{g}(\overline{a}|\overline{s}; Q)} \in &\mathop{\text{arg}\min}_{\rho\in\Pi_r^Q} \expectedvalue_{\overline{a}\sim\rho}Q_c(\overline{s}, \overline{a}), \\
+							\text{and }\quad \Pi_r^Q = &\mathop{\color{limegreen}{\text{arg}\max}}_{\rho\in\mathcal{M}(\overline{\mathcal{A}})} \expectedvalue_{\overline{a}\sim\rho} \color{limegreen}{Q_r(\overline{s}, \overline{a})} \\
+						& \text{ s.t. }  \expectedvalue_{\overline{a}\sim\rho} \color{crimson}{Q_c(\overline{s}, \overline{a})} \color{lightskyblue}{\leq \beta}
+						\end{aligned}
+						\]</span>
+					</p>
+				</section>
+				<section>
+					<header><h3>The optimal policy</h3></header>
+					<div class="theorem"><p align="left"><strong>Proposition <a href="https://budgeted-rl.github.io/">(NeurIPS 2019)</a></strong></p>
+						<ul>
+							<li class="fragment">$\color{orange}{\pi_\text{g}(\cdot\,; \overline{Q}^\star)}$ is optimal.</li>
+							<li class="fragment">$\color{orange}{\pi_\text{g}(\cdot\,; \overline{Q})}$ can be computed <strong>efficiently</strong> as a mixture $\color{limegreen}{\pi_{\text{hull}}}$ of two points on the <span class="green">convex hull</span> of $\overline{Q}$.</li>
+						</ul>
+					</div>
+				</section>
+				<section>
+					<header><h3>How to compute $\overline{Q}^\star$?</h3></header>
+					<ul>
+						<li class="fragment check" data-fragment-index="0">We have $\color{lightskyblue}{\overline{Q}^\star} = \mathcal{T}\color{lightskyblue}{\overline{Q}^\star}$</li>
+						<li class="fragment idea" data-fragment-index="1">Apply $Q_{k+1}\gets\mathcal{T}Q_k$</li>
+						<li class="fragment cross" data-fragment-index="3">We <span class="red">cannot guarantee</span> convergence of $Q_k$</li>
+					</ul>
+					<br>
+					<br>
+					<p align="left" class="theorem fragment" data-fragment-index="2"><strong>Theorem <a href="https://budgeted-rl.github.io/">(NeurIPS 2019)</a></strong> For any BMDP with $|\mathcal{A}|\geq 2$, $\mathcal{T}$ is <span class="red" style="font-weight: bold">not</span> a contraction.</p>
+				</section>
+				<section style="font-size: 90%">
+					<header><h3>How to compute $\overline{Q}^\star$?</h3></header>
+					<p align="left" class="theorem fragment"><strong>Theorem <a href="https://budgeted-rl.github.io/">(NeurIPS 2019)</a></strong> $\mathcal{T}$ is <span class="green">a contraction</span> on the subset
+						\[\{\overline{Q}: ``\color{limegreen}{Q_r} \text{ is L-Lipschitz with respect to } \color{crimson}{Q_c}"\}\]
+					with $L<1/\gamma - 1$.
+					</p>
+					<ul>
+						<li class="fragment check">We <span class="green">guarantee</span> convergence under (strong) assumptions</li>
+						<li class="fragment check">We <span class="green">observe</span> empirical convergence</li>
+					</ul>
+				</section>
+				<section>
+					<header><h3>Results</h3></header>
+					<img data-src="images/budgeted/highway.svg" width="80%">
+				</section>
+				<section>
+					<header><h3>Two-way road</h3></header>
+					<figure class="fragment fade-down" data-fragment-index="0">
+					<img data-src="videos/budgeted/highway-safe.gif" width="55%" style="margin-bottom: 0px">
+					<figcaption style="font-size: 50%">$\color{limegreen}{\beta=0}$</figcaption>
+					</figure>
+					<figure class="fragment fade-left" data-fragment-index="2">
+					<img data-src="videos/budgeted/highway-neutral.gif" width="55%" style="margin-bottom: 0px">
+					<figcaption style="font-size: 50%">$\color{lightskyblue}{\beta=0.2}$</figcaption>
+					</figure>
+					<figure class="fragment fade-up" data-fragment-index="1">
+					<img data-src="videos/budgeted/highway-risky.gif" width="55%" style="margin-bottom: 0px">
+					<figcaption style="font-size: 50%">$\color{crimson}{\beta=1}$</figcaption>
+					</figure>
+				</section>
+			</section>
+
+
+
+
+			<section>
+				<section>
+					<header><h3>Conclusion</h3></header>
+				</section>
+				<section style="font-size:68%">
+					<header><h3><span class="fragment fade-down" style="display: inline-block;"><span class="green">Safe Decision-making</span></span> <span class="fragment fade-down" style="display: inline-block;">among <span class="blue">interacting drivers</span></span> <span class="fragment fade-down" style="display: inline-block;">with <span class="red">behavioural uncertainty</span></span></h3></header>
+					<br>
+					<ol>
+						<li class="fragment">Model-based
+							<ul>
+								<li class="fragment">Build a <span class="red">confidence region</span> around the true model</li>
+								<li class="fragment">Propagate a stable <span class="red">interval predictor</span></li>
+								<li class="fragment">Optimise with a <span class="green">pessimistic surrogate</span></li>
+								<li class="fragment">Test the <span class="blue">adequacy</span> of multiple models</li>
+							</ul>
+						</li>
+						<br>
+						<li class="fragment">Model-free
+							<ul>
+								<li class="fragment">Use <span class="blue">self-attention</span> for social interactions</li>
+								<li class="fragment">Constrain the <span class="red">expected risk</span> below a <span class="green">budget</span></li>
+							</ul>
+						</li>
+					</ol>
+				</section>
+				<section style="font-size:92%">
+					<header><h3>Summary of our contributions</h3></header>
+					<small>
+					<ul>
+						<li class="fragment">International Conferences
+							<ul style="list-style: none">
+								<li><em>Practical Open-Loop Optimistic Planning</em> <a href="https://eleurent.github.io/kl-olop/">(ECML 2019)</a></li>
+								<li><em>Interval Prediction for Continuous-Time Systems with Parametric Uncertainties</em> <a href="https://eleurent.github.io/interval-prediction/">(CDC 2019)</a></li>
+								<li><em>Budgeted Reinforcement Learning in Continuous State Space</em> <a href="https://budgeted-rl.github.io//">(NeurIPS 2019)</a></li>
+								<li><em>Robust-Adaptive Interval Predictive Control for Linear Uncertain Systems</em> <a href="">(CDC 2020)</a></li>
+								<li><em>Monte-Carlo Graph Search: the Value of Merging Similar States</em> <a href="">(ACML 2020)</a></li>
+								<li><em>Robust-Adaptive Control of Linear Systems: beyond Quadratic Costs</em> <a href="https://eleurent.github.io/robust-beyond-quadratic/">(NeurIPS 2020, oral)</a></li>
+							</ul>
+						</li>
+						<li class="fragment">Workshops
+							<ul style="list-style: none">
+								<li><em>Approximate Robust Control of Uncertain Dynamical Systems</em> <a href="https://eleurent.github.io/robust-control/">(MLITS at NeurIPS 2018)</a></li>
+								<li><em>Social Attention for Autonomous Decision-Making in Dense Traffic</em> <a href="https://eleurent.github.io/social-attention/">(ML4AD at NeurIPS 2019)</a></li>
+							</ul>
+						</li>
+						<li class="fragment">Collaborations
+							<ul style="list-style: none">
+								<li><em>Planning in Markov Decision Processes with Gap-Dependent Sample Complexity</em> <a href="https://eleurent.github.io/planning-gap-complexity/">(NeurIPS 2020)</a></li>
+								<li><em>Adaptive Reward-Free Exploration</em> <a href="https://arxiv.org/abs/2006.06294">(Submitted to ALT 2021)</a></li>
+								<li><em>Fast active learning for pure exploration in reinforcement learning</em> <a href="https://hal.inria.fr/hal-02906985v1">(preprint)</a></li>
+							</ul>
+						</li>
+						<li class="fragment">Software
+							<ul style="list-style: none">
+								<li><em>An Environment for Autonomous Driving Decision-Making</em> <a href="https://github.com/eleurent/highway-env">(highway-env)</a></li>
+								<li><em>Implementations of Reinforcement Learning and Planning algorithms </em> <a href="https://github.com/eleurent/rl-agents">(rl-agents)</a></li>
+							</ul>
+						</li>
+					</ul>
+					</small>
+				</section>
+				<section>
+					<header><h3>Perspectives</h3></header>
+					<ul>
+						<li class="fragment">Model-based
+							<ul>
+								<li style="list-style: none">Relax perfect perception</li> <!-- Difficulty depend on the observation model, adding bounded observation noise is easy to integrate, but oclusions are more difficult -->
+								<li style="list-style: none">Relax linear dynamics</li> <!-- SOTA for motion forecasting NNs, difficult to have guarantees, but output probabilistic predicions -->
+							</ul>
+						</li>
+						<li class="fragment">Model-free
+						<ul>
+							<li style="list-style: none">Exploit scene information</li>
+							<li style="list-style: none">Exploration in continuous spaces</li>
+						</ul>
+						<li class="fragment">Stronger evaluation process</li>
+						<li class="fragment">Get my driver's license</li>
+					</ul>
+				</section>
+				<section class="title" data-background-video="videos/traffic_blur.mp4" data-background-video-loop data-background-video-muted>
+					<h2>Thank you</h2>
+				</section>
+			</section>
+		</div>
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/search/search.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script src="plugin/math/math.js"></script>
+	<script src="plugin/zoom/zoom.js"></script>
+	<script async defer src="https://buttons.github.io/buttons.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
+			slideNumber: true,
+			math: {
+				mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
+				config: 'TeX-AMS_HTML-full',
+		      // pass other options into `MathJax.Hub.Config()`
+		      TeX: { Macros: {
+		      	Real: "{\\mathbb{R}}",
+		      	cC: "{\\mathcal{C}}",
+		      	expectedvalue: "\\mathop{\\mathbb{E}}",
+		      }}
+		  },
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [ RevealSearch, RevealHighlight, RevealNotes, RevealMath, RevealZoom ]
+		});
+	</script>
+</body>
+</html>
