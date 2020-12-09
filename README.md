@@ -2,8 +2,6 @@
 
 This repository contains the slides that I used for my talk at RIKEN AIP, which is about _Bayesian Best-Arm Identification_. It is powered by [reveal.js](https://revealjs.com).
 
-* See the [slides :page_facing_up:](https://xuedong.github.io/riken_talk/) online.
-
 ## Usage
 
 The slides are in simple HTML/CSS/JS, and there are several ways to visualize them.
