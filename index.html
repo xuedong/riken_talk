@@ -134,12 +134,18 @@
 				<section>
 					<div class="r-stack">
 						<p class="fragment fade-in-then-out" data-fragment-index="0">We are interested in <u>T</u>op-<u>T</u>wo <u>T</u>hompson <u>S</u>ampling <strong>(Russo, 2016)</strong></p>
-						<pre><code class="fragment fade-in-then-out" data-fragment-index="1" data-trim data-noescape>
-							(def lazy-fib
-  							(concat
-   								[0 1]
-   								((fn rfib [a b]
-        						(lazy-cons (+ a b) (rfib b (+ a b)))) 0 1)))
+						<pre><code class="fragment fade-in-then-out" data-fragment-index="1" data-trim data-noescape data-line-numbers>
+input: beta
+for n = 1, 2, ...
+	for all i, theta_i ~ Pi_n
+	let I1 = argmax_{i=0,...,m} theta_i
+	if U ~ (U([0,1])) > beta
+		while I2 == I1
+		  let for all i, theta_i' ~ Pi_n
+		  let I2 = argmax_{i=0,...,m} theta_i'
+		let I1 = I2
+	evaluate arm I1
+	update Pi_n
   					</code></pre>
 					</div>
 				</section>
