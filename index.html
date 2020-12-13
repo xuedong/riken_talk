@@ -141,8 +141,8 @@ for n = 1, 2, ...
 	let I1 = argmax_{i=0,...,m} theta_i
 	if U ~ (U([0,1])) > beta
 		while I2 == I1
-		  let for all i, theta_i' ~ Pi_n
-		  let I2 = argmax_{i=0,...,m} theta_i'
+			for all i, theta_i' ~ Pi_n
+			let I2 = argmax_{i=0,...,m} theta_i'
 		let I1 = I2
 	evaluate arm I1
 	update Pi_n
