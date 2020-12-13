@@ -42,18 +42,28 @@
 					<header><h3>Introduction</h3></header>
 				</section>
  				<section>
-					<header><h3>Goal</h3></header>
+					<header><h3>What</h3></header>
 					<p text-align="center">Given a collection of <em>unknown</em> measurement distributions.</p>
 					<div class="r-stack">
 						<ol style="list-style-type: none;">
-							<li class="fragment fade-in-then-out" data-fragment-index="0"><p>$$\mu^\star = \color{red}{\operatorname{arg\,max}}_i \mu_i$$</p></li>
+							<li class="fragment fade-in-then-out" data-fragment-index="0"><p>$$\nu_1: \mu_1, \nu_2: \mu_2, \cdots, \nu_K: \mu_K$$</p></li>
 						</ol>
 						<figure class="fragment fade-in-then-out" data-fragment-index="1">
 							<video data-autoplay muted loop data-src="videos/multi_armed_bandit.webm" type="video/webm" height="400"></video>
 							<figcaption>Illustration and animation by Jana Beck</figcaption>
 						</figure>
-					<!--figcaption style="margin-top: 0.5rem; text-align: center;">Illustration and animation by Jana Beck</figcaption-->
 					</div>
+				</section>
+				<section>
+					<header><h3>Research questions</h3></header>
+					<br>
+					<ul>
+						<li class="fragment" data-fragment-index="0">Regret <span class="green">minimization</span>: trade-off between exploration and exploitation</li>
+						<li class="fragment" data-fragment-index="1">Best-arm <span class="red">identification</span>: pure exploration</li>
+						<ol style="list-style-type: none;">
+							<li class="fragment fade-in-then-out" data-fragment-index="2"><p>$$\mu^\star = \color{red}{\operatorname{arg\,max}}_i \mu_i$$</p></li>
+						</ol>
+					</ul>
 				</section>
 				<section>
 					<header><h3>Motivation</h3></header>
@@ -76,47 +86,23 @@
 					</div>
 				</section>
 				<section>
-					<header><h3>Research questions</h3></header>
-					<br>
-					<ul>
-						<li class="fragment">How to <span class="green">smoothly</span> interact with other agents?</li>
-						<li class="fragment">Can we guarantee <span class="red">safety</span> under uncertainty?</li>
-					</ul>
-				</section>
-				<section>
-					<header>
-						<h3 style="display:inline-block;">Benchmark: <a href="http://github.com/eleurent/highway-env">highway-env</a></h3>
-						<div style="display:inline-block;">
-							<a class="github-button" href="https://github.com/eleurent/highway-env" data-color-scheme="no-preference: dark; light: dark; dark: dark;" data-icon="octicon-star" data-show-count="true" aria-label="Star eleurent/highway-env on GitHub">Star</a>
-							<a class="github-button" href="https://github.com/eleurent/highway-env/fork" data-color-scheme="no-preference: dark; light: dark; dark: dark;" data-icon="octicon-repo-forked" data-show-count="true" aria-label="Fork eleurent/highway-env on GitHub">Fork</a>
-						</div>
-					</header>
-						<div class="container">
-						<div class="col">
-							<img data-src="videos/highway-env/highway.gif" width="100%">
-							<img data-src="videos/highway-env/roundabout-env.gif" width="80%">
-							<img data-src="videos/highway-env/merge-env.gif" width="100%">
-						</div>
-
-						<div class="col">
-							<img data-src="videos/highway-env/intersection-env.gif" width="70%">
-							<img data-src="videos/highway-env/parking-env.gif" width="70%">
-						</div>
-					</div>
-				</section>
-				<section>
 					<header><h3>Outline</h3></header>
 					<ul>
-						<li class="fragment" data-fragment-index="0">Model-based
+						<li class="fragment" data-fragment-index="0">Bayesian Best-Arm Identification
 							<ol>
-								<li class="fragment fade-in-then-semi-out" data-fragment-index="3"><a href="#/planning">Planning Fast</a></li>
-								<li class="fragment" data-fragment-index="4"><a href="#/preparing-worst">Preparing for the Worst</a></li>
+								<li class="fragment fade-in-then-semi-out" data-fragment-index="3"><a href="#/planning">Theoretical insights</a></li>
+								<li class="fragment fade-in-then-semi-out" data-fragment-index="4"><a href="#/preparing-worst">Computational improvement</a></li>
 							</ol>
 						</li>
-						<li class="fragment" data-fragment-index="1">Model-free
+						<li class="fragment" data-fragment-index="1">Application to Hyper-parameter Optimization (HPO)
 							<ol>
-								<li class="fragment" data-fragment-index="5"><a href="#/social-interactions">Considering Social Interactions</a></li>
-								<li class="fragment" data-fragment-index="6"><a href="#/acting-constraints">Acting under Adjustable Constraints</a></li>
+								<li class="fragment fade-in-then-semi-out" data-fragment-index="5"><a href="#/social-interactions">Best-arm identification for HPO</a></li>
+								<li class="fragment fade-in-then-semi-out" data-fragment-index="6"><a href="#/acting-constraints">Adaptivity to $\mu^\star$</a></li>
+							</ol>
+						</li>
+						<li class="fragment" data-fragment-index="2">Further discussion
+							<ol>
+								<li class="fragment" data-fragment-index="7"><a href="#/social-interactions">Extension to linear case?</a></li>
 							</ol>
 						</li>
 					</ul>
