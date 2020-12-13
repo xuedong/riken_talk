@@ -90,19 +90,19 @@
 					<ul>
 						<li class="fragment" data-fragment-index="0">Bayesian Best-Arm Identification
 							<ol>
-								<li class="fragment fade-in-then-semi-out" data-fragment-index="3"><a href="#/planning">Theoretical insights</a></li>
-								<li class="fragment fade-in-then-semi-out" data-fragment-index="4"><a href="#/preparing-worst">Computational improvement</a></li>
+								<li class="fragment fade-in-then-semi-out" data-fragment-index="3"><a href="#/ttts">Theoretical insights</a></li>
+								<li class="fragment fade-in-then-semi-out" data-fragment-index="4"><a href="#/t3c">Computational improvement</a></li>
 							</ol>
 						</li>
 						<li class="fragment" data-fragment-index="1">Application to Hyper-parameter Optimization (HPO)
 							<ol>
-								<li class="fragment fade-in-then-semi-out" data-fragment-index="5"><a href="#/social-interactions">Best-arm identification for HPO</a></li>
-								<li class="fragment fade-in-then-semi-out" data-fragment-index="6"><a href="#/acting-constraints">Adaptivity to $\mu^\star$</a></li>
+								<li class="fragment fade-in-then-semi-out" data-fragment-index="5"><a href="#/dttts">Best-arm identification for HPO</a></li>
+								<li class="fragment fade-in-then-semi-out" data-fragment-index="6"><a href="#/fix">Adaptivity to $\mu^\star$</a></li>
 							</ol>
 						</li>
 						<li class="fragment" data-fragment-index="2">Further discussion
 							<ol>
-								<li class="fragment" data-fragment-index="7"><a href="#/social-interactions">Extension to linear case?</a></li>
+								<li class="fragment" data-fragment-index="7"><a href="#/discussion">Extension to the linear case?</a></li>
 							</ol>
 						</li>
 					</ul>
@@ -111,19 +111,62 @@
 
 
 			<section>
-				<section id="planning">
-					<h2 style="color:grey">Model-based</h2><br>
-					<h4><ol><li style="color:grey">Planning fast</li></ol></h4>
-					<br>
-					<ul style="margin:0;">
-						<li style="color:grey; display: inline;"><a href="https://eleurent.github.io/kl-olop/">(ECML 2019)</a>, </li>
-						<li style="color:grey; display: inline;"><a href="http://www.edouardleurent.com/publication/graph-search/mcgs.pdf">(ACML 2020)</a></li>
+				<section id="bai">
+					<h2>Bayesian Best-Arm Identification</h2><br>
+				</section>
+				<section>
+				<header><p>Formally, a BAI algorithm is composed of:</p></header>
+				<ul>
+					<li class="fragment" data-fragment-index="0">a sampling rule</li>
+					<li class="fragment" data-fragment-index="1">a stopping rule $\tau$
+						<ol>
+							<li class="fragment fade-in-then-semi-out" data-fragment-index="2"><span class="green">fixed-budget</span>: stops when reach the budget $\tau = n$</li>
+							<li class="fragment" data-fragment-index="3"><span class="red">fixed-confidence</span>: stops when the probability of outputting a wrong arm is less than $\delta$, minimize $\expectedvalue[\tau_\delta]$</li>
+						</ol>
+					</li>
+					<li class="fragment" data-fragment-index="4">a decision rule
+						<ol>
+							<li class="fragment" data-fragment-index="5">outputs a guess of the best arm $J$ when the algorithm stops</li>
+						</ol>
+					</li>
+				</ul>
+				</section>
+				<section>
+					<div class="r-stack">
+						<p class="fragment fade-in-then-out" data-fragment-index="0">We are interested in <u>T</u>op-<u>T</u>wo <u>T</u>hompson <u>S</u>ampling <strong>(Russo, 2016)</strong></p>
+						<pre><code class="fragment fade-in-then-out" data-fragment-index="1" data-trim data-noescape>
+							(def lazy-fib
+  							(concat
+   								[0 1]
+   								((fn rfib [a b]
+        						(lazy-cons (+ a b) (rfib b (+ a b)))) 0 1)))
+  					</code></pre>
+					</div>
+				</section>
+				<section>
+					<header><h3>Why?</h3></header>
+					<ul>
+						<li class="fragment" data-fragment-index="0">Beyond fixed-budget and fixed-confidence: anytime BAI framework <strong>(Jun and Nowak, 2016)</strong></li>
+						<li class="fragment" data-fragment-index="1">A Bayesian competitor for BAI as Thompson sampling to <span class="green">UCB</span> for regret minimizing?
+							<ol>
+								<li class="fragment" data-fragment-index="2">It's often easier to sample from the fitted model than compute complicated optimistic estimates</li>
+								<li class="fragment" data-fragment-index="3">Strong practical performance?</li>
+							</ol>
+						</li>
 					</ul>
+				</section>
+				<section id="ttts">
+					<h4><ol><li>Theoretical insights</li></ol></h4>
+					<br>
+				</section>
+				<section id="t3c">
+					<h4><ol start="2"><li>Computational improvement</li></ol></h4>
+					<br>
 				</section>
 			</section>
 
 			<section>
-				<section id="preparing-worst">
+				<section id="bai-theory">
 					<h2>Model-based</h2><br>
 					<h4><ol start="2"><li>Preparing for the Worst</li></ol></h4>
 					<br>
