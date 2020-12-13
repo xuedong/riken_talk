@@ -43,13 +43,30 @@
 				</section>
  				<section>
 					<header><h3>Goal</h3></header>
+					<p text-align="center">Given a collection of <em>unknown</em> measurement distributions.</p>
 					<div class="r-stack">
-					<text class="fragment fade-in-then-out" data-fragment-index="0">
-						<p>Given a collection of unknown distributions.</p>
-					</text>
-					<video class="fragment fade-in-then-out" height="400" autoplay muted loop data-src="videos/multi_armed_bandit.webm" type="video/webm">
-					<p>Multi-armed bandits</p></video>
+						<ol style="list-style-type: none;">
+							<li class="fragment fade-in-then-out" data-fragment-index="0"><p>$$\mu^\star = \color{red}{\operatorname{arg\,max}}_i \mu_i$$</p></li>
+						</ol>
+						<video class="fragment" data-fragment-index="1" height="400" autoplay muted loop data-src="videos/multi_armed_bandit.webm" type="video/webm"><p>Multi-armed bandits</p></video>
 					<!--figcaption style="margin-top: 0.5rem; text-align: center;">Illustration and animation by Jana Beck</figcaption-->
+					</div>
+				</section>
+				<section>
+					<header><h3>Motivation</h3></header>
+					<div class="r-stack">
+					<figure class="fragment fade-in-then-out" data-fragment-index="0">
+						<img data-src="images/introduction/abc.jpg" width="100%">
+						<figcaption>A/B/C testing</figcaption>
+					</figure>
+					<figure class="fragment fade-in-then-out" data-fragment-index="1">
+						<img data-src="images/introduction/clinical_trials.png" width="100%">
+						<figcaption>Design of clinical trials</figcaption>
+					</figure>
+					<figure class="fragment fade-in-then-out" data-fragment-index="2">
+						<video data-autoplay muted loop data-src="videos/introduction/aeb.mp4" type="video/mp4"></video>
+						<figcaption>Hyper-parameter optimization (simulation optimization)</figcaption>
+					</figure>
 					</div>
 				</section>
 				<section>
