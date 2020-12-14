@@ -100,7 +100,6 @@
 						<li class="fragment" data-fragment-index="1">Application to Hyper-parameter Optimization (HPO)
 							<ol>
 								<li class="fragment fade-in-then-semi-out" data-fragment-index="5"><a href="#/dttts">Best-arm identification for HPO</a></li>
-								<li class="fragment fade-in-then-semi-out" data-fragment-index="6"><a href="#/fix">Adaptivity to $\mu^\star$</a></li>
 							</ol>
 						</li>
 						<li class="fragment" data-fragment-index="2">Further discussion
@@ -386,7 +385,6 @@ for n = 1, 2, ...
 			<section>
 				<section id="dttts">
 					<h2>Application to Hyper-paramter Optimization</h2><br>
-					<h4><ol><li>A Dynamic Algorithm</li></ol></h4>
 					<br>
 				</section>
 				<section>
@@ -398,7 +396,8 @@ for n = 1, 2, ...
 					</ul>
 				</section>
 				<section>
-					<header><h3>How? - BAI</h3></header>
+					<header><h3>Problem formulation</h3></header>
+					<p>HPO as a BAI problem</p>
 					<p style="text-align: left" class="fragment" data-fragment-index="0">We see the problem as BAI in a <em>stochastic infinitely-armed bandit</em>: arm means are drawn from some <em>reservoir distribution $\nu_0$</em></p>
 					<div class="r-stack">
 					<figure class="fragment fade-in-then-out" data-fragment-index="1">
@@ -410,6 +409,36 @@ for n = 1, 2, ...
 					</ul>
 					</div>
 					<p style="text-align: left" class="fragment" data-fragment-index="3"><span class="red">Goal</span>: output an arm with mean close to $\mu^\star$</span></p>
+				</section>
+				<section>
+					<header><h3>Problem formulation</h3></header>
+					<p>HPO as a BAI problem</p>
+					<table>
+						<thead>
+							<tr>
+								<th>BAI</th>
+								<th>HPO</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>query $\nu_0$</td>
+								<td>pick a new configuration $\lambda$</td>
+							</tr>
+						</tbody>
+						<tbody>
+							<tr>
+								<td>sample an arm</td>
+								<td>train the classifier</td>
+							</tr>
+						</tbody>
+						<tbody>
+							<tr>
+								<td>reward</td>
+								<td>cross-validation loss</td>
+							</tr>
+						</tbody>
+					</table>
 				</section>
 				<section>
 					<header><h3>How? - DTTTS</h3></header>
@@ -425,7 +454,113 @@ for n = 1, 2, ...
 					<figure class="fragment fade-in-then-out" data-fragment-index="2">
 						<img data-src="images/dttts/dttts.png" width="75%">
 					</figure>
+					<p style="text-align: left" class="fragment" data-fragment-index="3">
+						In summary: in each round, query a new arm endowed with a Beta(1,1) prior, <span class="red">without sampling it</span>, and run TTTS on the new set of arms
+					</p>
 					</div>
+				</section>
+				<section>
+					<header><h3>How? - DTTTS</h3></header>
+					<p>Order statistic trick</p>
+					<p style="text-align: left" class="fragment" data-fragment-index="0">
+						With $\mathcal{L}_{t-1}$ the list of arms that have been effectively sampled at time $t$, we run TTTS on the set $\mathcal{L}_{t-1} \cup \{\mu_0\}$ where $\mu_0$ is a pseudo-arm with posterior Beta($t-|\mathcal{L}_{t-1}|, 1$).
+					</p>
+					<figure class="fragment fade-in-then-out" data-fragment-index="1">
+						<img data-src="images/dttts/order_trick.png" width="60%">
+					</figure>
+				</section>
+				<section>
+					<header><h3>Rationale</h3></header>
+					<ul>
+						<li class="fragment" data-fragment-index="0">TTTS is anytime for finitely-armed bandits</li>
+						<li class="fragment" data-fragment-index="1">The flexibility of this Bayesian algorithm allows to propose a <em>dynamic</em> version for the infinite BAI</li>
+						<div class="r-stack">
+						<li class="fragment fade-in-then-out" data-fragment-index="2">Unlike previous approaches (for infinite-armed bandits or HPO), DTTTS <span class="red">does not</span> need to fix the number of arms queried in advance, and naturally \textbf{adapts} to the difficulty of the task</li>
+						<p class="fragment fade-in-then-out" data-fragment-index="3"><span class="green">SiRI</span> <strong>(Carpentier and Valko, 2015)</strong> as an example for infinite-armed bandits:</p>
+						<p class="fragment fade-in-then-out" data-fragment-index="4"><span class="green">Hyperband</span> <strong>(Li et al., 2017)</strong> as an example for HPO</p>
+						</div>
+						<div class="r-stack">
+						<ul>
+							<li class="fragment fade-in-then-out" data-fragment-index="3">choose a problem-dependent number of arms</li>
+							<li class="fragment fade-in-then-out" data-fragment-index="3">pull arms <em>optimistically</em></li>
+						</ul>
+						<ul>
+							<li class="fragment fade-in-then-out" data-fragment-index="4">equally divide the budget $B$ into $m$ brackets</li>
+							<li class="fragment fade-in-then-out" data-fragment-index="4">run sequential halving <strong>(Karnin et al., 2013)</strong> over a fixed number $n$ of configurations in each bracket</li>
+							<li class="fragment fade-in-then-out" data-fragment-index="4">trade-off between $B/mn$ and $n$</li>
+						</ul>
+					  </div>
+					</ul>
+				</section>
+				<section>
+					<header><h3>Experiments</h3></header>
+					<p>Setting</p>
+					<table style="font-size: 75%" class="fragment" data-fragment-index="0">
+						<thead>
+							<tr>
+								<th>Classifier</th>
+								<th>Hyper-parameter</th>
+								<th>Type</th>
+								<th>Bounds</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>SVM</td>
+								<td>C</td>
+								<td>$\mathbb{R}^+$</td>
+								<td>$\left[ 10^{-5}, 10^{5} \right]$</td>
+							</tr>
+						</tbody>
+						<tbody>
+							<tr>
+								<td></td>
+								<td>$\gamma$</td>
+								<td>$\mathbb{R}^+$</td>
+								<td>$\left[ 10^{-5}, 10^{5} \right]$</td>
+							</tr>
+						</tbody>
+						<tbody>
+							<tr>
+								<td>MLP</td>
+								<td>hidden layer size</td>
+								<td>Integer</td>
+								<td>$\left[ 5, 50 \right]$</td>
+							</tr>
+						</tbody>
+						<tbody>
+							<tr>
+								<td></td>
+								<td>$\alpha$</td>
+								<td>$\mathbb{R}^+$</td>
+								<td>$\left[ 0, 0.9 \right]$</td>
+							</tr>
+						</tbody>
+						<tbody>
+							<tr>
+								<td></td>
+								<td>learning rate init</td>
+								<td>$\mathbb{R}^+$</td>
+								<td>$\left[ 10^{-5}, 10^{-1} \right]$</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+				<section>
+					<header><h3>Experiments</h3></header>
+					<p>Some results (I)</p>
+					<figure class="fragment" data-fragment-index="0">
+						<img data-src="images/dttts/wine.png" width="49%">
+						<img data-src="images/dttts/breast_cancer.png" width="49%">
+					</figure>
+				</section>
+				<section>
+					<header><h3>Experiments</h3></header>
+					<p>Some results (II)</p>
+					<figure class="fragment" data-fragment-index="0">
+						<img data-src="images/dttts/adult.png" width="49%">
+						<img data-src="images/dttts/mnist.png" width="49%">
+					</figure>
 				</section>
 			</section>
 		</div>
