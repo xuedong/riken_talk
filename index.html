@@ -397,7 +397,6 @@ for n = 1, 2, ...
 				</section>
 				<section>
 					<header><h3>Problem formulation</h3></header>
-					<p>HPO as a BAI problem</p>
 					<p style="text-align: left" class="fragment" data-fragment-index="0">We see the problem as BAI in a <em>stochastic infinitely-armed bandit</em>: arm means are drawn from some <em>reservoir distribution $\nu_0$</em></p>
 					<div class="r-stack">
 					<figure class="fragment fade-in-then-out" data-fragment-index="1">
@@ -466,7 +465,7 @@ for n = 1, 2, ...
 						With $\mathcal{L}_{t-1}$ the list of arms that have been effectively sampled at time $t$, we run TTTS on the set $\mathcal{L}_{t-1} \cup \{\mu_0\}$ where $\mu_0$ is a pseudo-arm with posterior Beta($t-|\mathcal{L}_{t-1}|, 1$).
 					</p>
 					<figure class="fragment fade-in-then-out" data-fragment-index="1">
-						<img data-src="images/dttts/order_trick.png" width="60%">
+						<img data-src="images/dttts/order_trick.png" width="50%">
 					</figure>
 				</section>
 				<section>
@@ -561,6 +560,30 @@ for n = 1, 2, ...
 						<img data-src="images/dttts/adult.png" width="49%">
 						<img data-src="images/dttts/mnist.png" width="49%">
 					</figure>
+				</section>
+			</section>
+
+			<section>
+				<section id="discussion">
+					<h2>Further Discussion</h2><br>
+					<br>
+				</section>
+				<section>
+					<header><h3>BAI for linear bandits</h3></header>
+					<p>In the linear case:</p>
+					<ul>
+						<li class="fragment" data-fragment-index="0">each arm (context) is a vector $x\in\mathbb{R}^d$</li>
+						<li class="fragment" data-fragment-index="1"><em>unknown</em> regression parameter $\theta^\star\in\mathbb{R}^d$</li>
+						<li class="fragment" data-fragment-index="2">$\mu_i = x_i^T\theta^\star$</li>
+						<li class="fragment" data-fragment-index="3"><span class="red">goal</span>: $x^\star ≜ \operatorname{arg\,max}_{x\in\mathcal{X}}x^T\theta^\star$</li>
+					</ul>
+				</section>
+				<section>
+					<header><h3>BAI for linear bandits</h3></header>
+					<ul>
+						<li class="fragment" data-fragment-index="0">Can TTTS/T3C be extended to the linear case? (working paper)</li>
+						<li class="fragment" data-fragment-index="1">Saddle-point approach to achieve asymptotic optimality <strong>(Degenne, Menard, Shang and Valko, 2020)</strong></li>
+					</ul>
 				</section>
 			</section>
 		</div>
