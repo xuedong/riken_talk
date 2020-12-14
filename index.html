@@ -61,7 +61,10 @@
 						<li class="fragment" data-fragment-index="0">Regret <span class="green">minimization</span>: trade-off between exploration and exploitation</li>
 						<li class="fragment" data-fragment-index="1">Best-arm <span class="red">identification</span>: pure exploration</li>
 						<ol style="list-style-type: none;">
-							<li class="fragment fade-in-then-out" data-fragment-index="2"><p>$$\mu^\star = \color{red}{\operatorname{arg\,max}}_i \mu_i$$</p></li>
+							<li class="fragment fade-in-then-out" data-fragment-index="2">
+								<p>$$\mu^\star = \color{red}{\max}_i \mu_i$$</p>
+								<p>$$I^\star = \color{red}{\operatorname{arg\,max}}_i \mu_i$$</p>
+							</li>
 						</ol>
 					</ul>
 				</section>
@@ -117,7 +120,7 @@
 				<section>
 				<header><p>Formally, a BAI algorithm is composed of:</p></header>
 				<ul>
-					<li class="fragment" data-fragment-index="0">a sampling rule</li>
+					<li class="fragment" data-fragment-index="0">a sampling rule $\hat{I}$</li>
 					<li class="fragment" data-fragment-index="1">a stopping rule $\tau$
 						<ol>
 							<li class="fragment fade-in-then-semi-out" data-fragment-index="2"><span class="green">fixed-budget</span>: stops when reach the budget $\tau = n$</li>
@@ -126,7 +129,7 @@
 					</li>
 					<li class="fragment" data-fragment-index="4">a decision rule
 						<ol>
-							<li class="fragment" data-fragment-index="5">outputs a guess of the best arm $J$ when the algorithm stops</li>
+							<li class="fragment" data-fragment-index="5">outputs a guess $J_\tau$ of the best arm $I^\star$ when the algorithm stops</li>
 						</ol>
 					</li>
 				</ul>
@@ -134,19 +137,22 @@
 				<section>
 					<div class="r-stack">
 						<p class="fragment fade-in-then-out" data-fragment-index="0">We are interested in <u>T</u>op-<u>T</u>wo <u>T</u>hompson <u>S</u>ampling <strong>(Russo, 2016)</strong></p>
-						<pre><code class="fragment fade-in-then-out" data-fragment-index="1" data-trim data-noescape data-line-numbers>
+						<!--pre><code class="fragment fade-in-then-out" data-fragment-index="1" data-trim data-noescape data-line-numbers>
 input: beta
 for n = 1, 2, ...
 	for all i, theta_i ~ Pi_n
 	let I1 = argmax_{i=0,...,m} theta_i
-	if U ~ (U([0,1])) > beta
+	if U ~ (Uniform([0,1])) > beta
 		while I2 == I1
 			for all i, theta_i' ~ Pi_n
 			let I2 = argmax_{i=0,...,m} theta_i'
 		let I1 = I2
 	evaluate arm I1
 	update Pi_n
-  					</code></pre>
+						</code></pre-->
+						<figure class="fragment fade-in-then-out" data-fragment-index="1">
+							<img data-src="images/ttts/ttts.png" width="100%">
+						</figure>
 					</div>
 				</section>
 				<section>
@@ -161,9 +167,96 @@ for n = 1, 2, ...
 						</li>
 					</ul>
 				</section>
+				<section>
+					<header><p>What we know about TTTS... (Posterior convergence)</p></header>
+					<div class="r-stack">
+					<ul>
+						<li class="fragment fade-in-then-out" data-fragment-index="1">Assumptions</li>
+						<ol>
+							<li class="fragment fade-in-then-out" data-fragment-index="1">Measurement distributions are in the canonical one dimensional exponential family</li>
+							<li class="fragment fade-in-then-out" data-fragment-index="1">The parameter space is a bounded open hyper-rectangle</li>
+							<li class="fragment fade-in-then-out" data-fragment-index="1">The prior density is uniformly bounded</li>
+							<li class="fragment fade-in-then-out" data-fragment-index="1">The log-partition function has bounded first derivative</li>
+						</ol>
+					</ul>
+					<p class="theorem fragment" data-fragment-index="2"><strong>Theorem (Russo, 2016)</strong>
+							Under TTTS and under the previous boundedness assumptions, it holds a.s.
+    					\[
+        				\lim_{n\rightarrow{\infty}} -\frac{1}{n}\log(1-\alpha_{n,I^\star}) = \color{red}{\Gamma_{\beta}^\star},
+    					\]
+
+    					where
+    					\begin{equation*}
+        				\quad \alpha_{n,i} \triangleq \Pi_{n}(\theta_i > \max_{j\neq i}\theta_j).
+    					\end{equation*}
+					</p>
+					</div>
+				</section>
+				<section>
+					<header><p>What we know about TTTS... (Complexity)</p></header>
+					<div class="r-stack">
+					<p class="theorem fragment fade-in-then-out" data-fragment-index="0"><strong>Definition</strong>
+						Let $\Sigma_K = \{\omega : \sum_{k=1}^K \omega_k = 1, \omega_k \geq 0\}$ and define for all $i\neq I^\star$
+						\[
+    					C_i(\omega,\omega') \triangleq \min_{x\in\mathcal{I}} \omega d(\mu_{I^\star};x) + \omega' d(\mu_i;x),
+						\]
+						where $d(\mu,\mu')$ is the KL-divergence. We define
+						\begin{eqnarray*}
+    					\Gamma_{\beta}^\star \triangleq \max_{\substack{\omega \in \Sigma_K\\\omega_{I^\star}=\beta}}\min_{i\neq I^\star} C_i(\omega_{I^\star},\omega_i).\label{def:GammaBeta}
+						\end{eqnarray*}
+					</p>
+					<p class="fragment" data-fragment-index="1"><span class="red">In particular, for Gaussian bandits...</span>
+						\[
+    					\Gamma_{\beta}^\star = \max_{\omega:\omega_{I^\star}=\beta}\min_{i\neq I^\star} \frac{(\mu_{I^\star}-\mu_i)^2}{2\sigma^2(1/\omega_i+1/\beta)}.
+						\]
+					</p>
+					</div>
+				</section>
+				<section>
+					<header><p>What we want to know about TTTS...</p></header>
+					<ul>
+						<li class="fragment" data-fragment-index="0">Can we 'relax' the aforementioned assumptions?</li>
+						<li class="fragment" data-fragment-index="1">What can we say about the sample complexity in the fixed-confidence setting?</li>
+						<li class="theorem fragment" data-fragment-index="2"><strong>Lower bound</strong>
+							Under any $\delta$-correct strategy satisfying $T_{n,I^\star}/n \rightarrow \beta$,
+    					\[\liminf_{\delta \rightarrow 0}\frac{\expectedvalue[\tau_\delta]}{\ln(1/\delta)} \geq \frac{1}{\Gamma^\star_\beta}.\]
+						</li>
+						<li class="fragment fade-in-then-semi-out" data-fragment-index="3">Can we have finite-time guarantees?</li>
+					</ul>
+					<p class="fragment fade-in-then-semi-out" data-fragment-index="4"></p>
+				</section>
 				<section id="ttts">
 					<h4><ol><li>Theoretical insights</li></ol></h4>
 					<br>
+				</section>
+				<section>
+					<header><h3>Main results</h3></header>
+					<p>Posterior convergence</p>
+					<p class="theorem fragment fade-in-then-semi-out" data-fragment-index="0"><strong>Theorem 1 (Shang et al., 2020)</strong>
+						Under TTTS, for Gaussian bandits with Gaussian priors, it holds a.s.
+    				\[
+        			\lim_{n\rightarrow{\infty}} -\frac{1}{n}\log(1-\alpha_{n,I^\star}) = \color{red}{\Gamma_{\beta}^\star}.
+    				\]
+					</p>
+					<p class="theorem fragment fade-in-then-semi-out" data-fragment-index="1"><strong>Theorem 2 (Shang et al., 2020)</strong>
+						Under TTTS, for Bernoulli bandits and uniform priors, it holds a.s.
+						\[
+							\lim_{n\rightarrow{\infty}} -\frac{1}{n}\log(1-\alpha_{n,I^\star}) = \color{red}{\Gamma_{\beta}^\star}.
+						\]
+					</p>
+				</section>
+				<section>
+					<header><h3>Main results</h3></header>
+					<p>Sample complexity</p>
+					<p class="theorem fragment" data-fragment-index="0"><strong>Theorem 3 (Shang et al., 2020)</strong>
+						The TTTS sampling rule coupled with the Chernoff stopping rule form a $\delta$-correct BAI strategy. If all arm means are distinct,
+    				\[
+        			\limsup_{\delta\rightarrow{0}} \frac{\expectedvalue[\tau_{\delta}]}{\log(1/\delta)} \leq \frac{1}{\color{red}{\Gamma_{\beta}^\star}}.
+    				\]
+					</p>
+					<p class="theorem fragment" data-fragment-index="1">Recall (Lower bound):</strong>
+        		\[\liminf_{\delta \rightarrow 0}\frac{\expectedvalue[\tau_\delta]}{\ln(1/\delta)} \geq \frac{1}{\color{red}{\Gamma^\star_\beta}}.\]
+					</p>
 				</section>
 				<section id="t3c">
 					<h4><ol start="2"><li>Computational improvement</li></ol></h4>
