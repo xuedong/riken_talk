@@ -585,6 +585,59 @@ for n = 1, 2, ...
 						<li class="fragment" data-fragment-index="1">Saddle-point approach to achieve asymptotic optimality <strong>(Degenne, Menard, Shang and Valko, 2020)</strong></li>
 					</ul>
 				</section>
+				<section style="font-size:60%">
+					<header><h3>References</h3></header>
+					<ul>
+						<li class="fragment">Presentation based on
+							<ul style="list-style: none">
+								<li><em><a href="https://xuedong.github.io/static/documents/shang2020t3c.pdf">Fixed-confidence guarantees for Bayesian best-arm identification</a></em> (AISTATS 2020)</li>
+								<li><em><a href="https://xuedong.github.io/static/documents/shang2020t3c.pdf">A simple dynamic bandit algorithm for hyper-parameter tuning</a></em> (ICML-AutoML 2019)</li>
+								<li><em><a href="https://xuedong.github.io/static/documents/degenne2020game.pdf">Gamification of pure exploration for linear bandits</a></em> (ICML 2020)</li>
+							</ul>
+						</li>
+						<li class="fragment">Other references
+							<ul style="list-style: none">
+								<li><em><a href="https://arxiv.org/pdf/1602.08448.pdf">Simple Bayesian algorithms for best arm identification</a></em>, Russo (COLT 2016)</li>
+								<li><em><a href="https://proceedings.mlr.press/v28/karnin13.pdf">Almost optimal exploration in multi-armed bandits</a></em>, Karnin et al. (ICML 2013)</li>
+								<li><em><a href="https://openreview.net/pdf?id=ry18Ww5ee">Hyperband: Bandit-based configuration evaluation for hyperparameter optimization</a></em>, Li et al. (ICLR 2017)</li>
+								<li><em><a href="https://papers.nips.cc/paper/2017/file/b19aa25ff58940d974234b48391b9549-Paper.pdf">Improving the expected improvement algorithm</a></em>, Qin et al. (NeurIPS 2017)</li>
+								<li><em><a href="https://proceedings.mlr.press/v37/carpentier15.pdf">Simple regret for infinitely many armed bandits</a></em>, Carpentier and Valko (ICML 2015)</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<section id="future">
+					<h2>Future Plan</h2><br>
+					<br>
+				</section>
+				<section>
+					<header><h3>Beysian Reinforcement learning</h3></header>
+					<ul>
+						<li class="fragment" data-fragment-index="0">each arm (context) is a vector $x\in\mathbb{R}^d$</li>
+						<li class="fragment" data-fragment-index="1"><em>unknown</em> regression parameter $\theta^\star\in\mathbb{R}^d$</li>
+						<li class="fragment" data-fragment-index="2">$\mu_i = x_i^T\theta^\star$</li>
+						<li class="fragment" data-fragment-index="3"><span class="red">goal</span>: $x^\star ≜ \operatorname{arg\,max}_{x\in\mathcal{X}}x^T\theta^\star$</li>
+					</ul>
+				</section>
+				<section>
+					<header><h3>Theoretical foundations of approximate Bayesian inference</h3></header>
+					<ul>
+						<li class="fragment" data-fragment-index="0">Can TTTS/T3C be extended to the linear case? (working paper)</li>
+						<li class="fragment" data-fragment-index="1">Saddle-point approach to achieve asymptotic optimality <strong>(Degenne, Menard, Shang and Valko, 2020)</strong></li>
+					</ul>
+				</section>
+				<section>
+					<header><h3>Direct follow-ups</h3></header>
+					<ul>
+						<li class="fragment" data-fragment-index="0">each arm (context) is a vector $x\in\mathbb{R}^d$</li>
+						<li class="fragment" data-fragment-index="1"><em>unknown</em> regression parameter $\theta^\star\in\mathbb{R}^d$</li>
+						<li class="fragment" data-fragment-index="2">$\mu_i = x_i^T\theta^\star$</li>
+						<li class="fragment" data-fragment-index="3"><span class="red">goal</span>: $x^\star ≜ \operatorname{arg\,max}_{x\in\mathcal{X}}x^T\theta^\star$</li>
+					</ul>
+				</section>
 			</section>
 		</div>
 	</div>
