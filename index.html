@@ -151,7 +151,7 @@ for n = 1, 2, ...
 	update Pi_n
 						</code></pre-->
 						<figure class="fragment fade-in-then-out" data-fragment-index="1">
-							<img data-src="images/ttts/ttts.png" width="100%">
+							<img data-src="images/ttts/ttts1.png" width="100%">
 						</figure>
 					</div>
 				</section>
@@ -226,6 +226,7 @@ for n = 1, 2, ...
 					<p class="fragment fade-in-then-semi-out" data-fragment-index="4"></p>
 				</section>
 				<section id="ttts">
+					<h2>Bayesian Best-Arm Identification</h2><br>
 					<h4><ol><li>Theoretical insights</li></ol></h4>
 					<br>
 				</section>
@@ -254,13 +255,120 @@ for n = 1, 2, ...
         			\limsup_{\delta\rightarrow{0}} \frac{\expectedvalue[\tau_{\delta}]}{\log(1/\delta)} \leq \frac{1}{\color{red}{\Gamma_{\beta}^\star}}.
     				\]
 					</p>
-					<p class="theorem fragment" data-fragment-index="1">Recall (Lower bound):</strong>
+					<p class="theorem fragment" data-fragment-index="1">Recall (Lower bound):
         		\[\liminf_{\delta \rightarrow 0}\frac{\expectedvalue[\tau_\delta]}{\ln(1/\delta)} \geq \frac{1}{\color{red}{\Gamma^\star_\beta}}.\]
 					</p>
 				</section>
+				<section>
+					<header><h3>Proof sketch</h3></header>
+					<p>$\delta$-correctness</p>
+					<p class="theorem fragment" data-fragment-index="0">Stopping rule:
+						\begin{equation}
+    					\tau_\delta^{\text{Ch.}} ≜ \inf \left\lbrace n \in \mathbb{N} : \max_{i \in \mathcal{A}} \min_{j \in \mathcal{A} \setminus \{i\} } \color{lightskyblue}{W_{n}(i,j)} > d_{n,\delta} \right\rbrace.
+						\end{equation}
+					</p>
+					<div class="r-stack">
+					<p class="theorem fragment fade-in-then-out" data-fragment-index="1"><strong>Transportation cost</strong>:
+						$\mu_{n,i,j} ≜ (T_{n,i}\mu_{n,i} +T_{n,j}\mu_{n,j})/(T_{n,i}+T_{n,j})$, then we define
+						\begin{equation}\label{def:Transportation}
+							\color{lightskyblue}{W_n(i,j)} ≜
+							\left\{ \begin{array}{ll}
+							0 & \operatorname{if} \mu_{n,j} \geq \mu_{n,i},\\
+							W_{n,i,j}+W_{n,j,i} & \operatorname{otherwise},
+							\end{array}\right.
+						\end{equation}
+						where $W_{n,i,j} ≜ T_{n,i} d\left(\mu_{n,i},\mu_{n,i,j}\right)$ for any $i,j$.
+					</p>
+					<p class="theorem fragment fade-in-then-out" data-fragment-index="2"><span class="red">In particular, for Gaussian bandits</span>:
+						\[
+							\color{lightskyblue}{W_n(i,j)} = \dfrac{(\mu_{n,i}-\mu_{n,j})^2}{2\sigma^2(1/T_{n,i}+1/T_{n,j})}\mathbb{1}\{\mu_{n,j}<\mu_{n,i}\}.
+						\]
+					</p>
+					<p class="theorem fragment fade-in-then-out" data-fragment-index="3"><strong>Theorem (Shang et al., 2020)</strong>
+						The TTTS sampling rule coupled with the Chernoff stopping rule with a threshold $d_{n,\delta} \simeq \log(1/\delta) + c\log(\log(n))$ and the recommendation rule $J_t = \operatorname{arg\,max}_i \mu_{n,i}$, form a $\delta$-correct BAI strategy.
+					</p>
+					<p class="theorem fragment fade-in-then-out" data-fragment-index="4">Bayesian stopping rule:
+						\[\tau_{\delta} ≜ \inf \left\{ n\in\mathbb{N}:\max_{i\in\mathcal{A}} \color{limegreen}{a_{n,i}} \geq c_{n,\delta} \right\}\,.\]
+					</p>
+					</div>
+				</section>
+				<section>
+					<header><h3>Proof sketch</h3></header>
+					<p>Sufficient condition for $\beta$-optimality</p>
+					<p class="theorem fragment" data-fragment-index="0"><strong>Lemma (Shang et al. 2020)</strong>
+						Let $\delta,\beta\in (0,1)$. For any sampling rule which satisfies $\expectedvalue[\color{lightskyblue}{T_{\beta}^\epsilon}] < \infty$ for all $\epsilon > 0$, we have
+	    			\[
+	        		\limsup_{\delta\rightarrow{0}} \frac{\expectedvalue[\tau_{\delta}]}{\log(1/\delta)} \leq \frac{1}{\Gamma_{\beta}^\star},
+	    			\]
+	    			if the sampling rule is coupled with the Chernoff stopping rule.
+					</p>
+					<p class="fragment" data-fragment-index="1">$\color{lightskyblue}{T_{\beta}^\epsilon} ≜ \inf \left\{ N\in\mathbb{N}: \max_{i\in\mathcal{A}} \vert T_{n,i}/n-\omega_i^\beta \vert \leq \epsilon, \forall n \geq N \right\}$.</p>
+				</section>
+				<section>
+					<header><h3>Proof sketch</h3></header>
+					<p>Core theorem</p>
+					<p class="theorem fragment" data-fragment-index="0"><strong>Theorem (Shang et al. 2020)</strong>
+						Under TTTS, $\expectedvalue[\color{lightskyblue}{T_{\beta}^\epsilon}] < +\infty$.
+					</p>
+					<p class="fragment" data-fragment-index="1">The proof is inspired by <strong>Qin et al. (2017)</strong>, but major technical novelties are introduced. In particular, our proof is much more intricate due to the randomized nature of the two candidate arms...</p>
+				</section>
+			</section>
+
+			<section>
 				<section id="t3c">
+					<h2>Bayesian Best-Arm Identification</h2><br>
 					<h4><ol start="2"><li>Computational improvement</li></ol></h4>
 					<br>
+				</section>
+				<section>
+					<p>TTTS</p>
+					<figure class="fragment" data-fragment-index="0">
+						<img data-src="images/ttts/ttts2.png" width="100%">
+					</figure>
+				</section>
+				<section>
+					<p>T3C (Top-Two Transportation Cost)</p>
+					<figure class="fragment" data-fragment-index="0">
+						<img data-src="images/ttts/t3c.png" width="100%">
+					</figure>
+				</section>
+				<section>
+					<header><h3>Main results</h3></header>
+					<p>Sample complexity</p>
+					<p class="theorem fragment" data-fragment-index="0"><strong>Theorem (Shang et al. 2020)</strong>
+						The T3C sampling rule coupled with the Chernoff stopping rule form a $\delta$-correct BAI strategy. If all arm means are distinct,
+						\[
+							\limsup_{\delta\rightarrow{0}} \frac{\expectedvalue[\tau_{\delta}]}{\log(1/\delta)} \leq \frac{1}{\color{red}{\Gamma_{\beta}^\star}}.
+						\]
+					</p>
+				</section>
+				<section>
+					<header><h3>Illustrations</h3></header>
+					<p>Time consumption</p>
+					<table>
+						<thead>
+							<tr>
+								<th>Sampling rule</th>
+								<th>T3C</th>
+								<th>TTTS</th>
+								<th>Uniform</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Exec. time (s)</td>
+								<td><span class="fragment highlight-blue" data-fragment-index="0">$1.6 \times 10^{-5}$</span></td>
+								<td>$2.3 \times 10^{-4}$</td>
+								<td><span class="fragment highlight-green" data-fragment-index="0">$6.0 \times 10^{-6}$</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+				<section>
+					<header><h3>Illustrations</h3></header>
+					<p>Average stopping time</p>
+					<img data-src="images/ttts/bernoulli1.pdf" height="50">
+					<img data-src="images/ttts/bernoulli2.pdf" height="50">
 				</section>
 			</section>
 
