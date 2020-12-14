@@ -230,10 +230,10 @@ for n = 1, 2, ...
 					<h4><ol><li>Theoretical insights</li></ol></h4>
 					<br>
 				</section>
-				<section>
+				<section style="font-size: 75%">
 					<header><h3>Main results</h3></header>
 					<p>Posterior convergence</p>
-					<p class="theorem fragment fade-in-then-semi-out" data-fragment-index="0"><strong>Theorem 1 (Shang et al., 2020)</strong>
+					<p class="theorem fragment" data-fragment-index="0"><strong>Theorem 1 (Shang et al., 2020)</strong>
 						Under TTTS, for Gaussian bandits with Gaussian priors, it holds a.s.
     				\[
         			\lim_{n\rightarrow{\infty}} -\frac{1}{n}\log(1-\alpha_{n,I^\star}) = \color{red}{\Gamma_{\beta}^\star}.
@@ -246,7 +246,7 @@ for n = 1, 2, ...
 						\]
 					</p>
 				</section>
-				<section>
+				<section style="font-size: 75%">
 					<header><h3>Main results</h3></header>
 					<p>Sample complexity</p>
 					<p class="theorem fragment" data-fragment-index="0"><strong>Theorem 3 (Shang et al., 2020)</strong>
@@ -259,7 +259,7 @@ for n = 1, 2, ...
         		\[\liminf_{\delta \rightarrow 0}\frac{\expectedvalue[\tau_\delta]}{\ln(1/\delta)} \geq \frac{1}{\color{red}{\Gamma^\star_\beta}}.\]
 					</p>
 				</section>
-				<section>
+				<section style="font-size: 75%">
 					<header><h3>Proof sketch</h3></header>
 					<p>$\delta$-correctness</p>
 					<p class="theorem fragment" data-fragment-index="0">Stopping rule:
@@ -287,12 +287,13 @@ for n = 1, 2, ...
 					<p class="theorem fragment fade-in-then-out" data-fragment-index="3"><strong>Theorem (Shang et al., 2020)</strong>
 						The TTTS sampling rule coupled with the Chernoff stopping rule with a threshold $d_{n,\delta} \simeq \log(1/\delta) + c\log(\log(n))$ and the recommendation rule $J_t = \operatorname{arg\,max}_i \mu_{n,i}$, form a $\delta$-correct BAI strategy.
 					</p>
-					<p class="theorem fragment fade-in-then-out" data-fragment-index="4">Bayesian stopping rule:
+					<p class="theorem fragment fade-in-then-semi-out" data-fragment-index="4">Bayesian stopping rule:
 						\[\tau_{\delta} ≜ \inf \left\{ n\in\mathbb{N}:\max_{i\in\mathcal{A}} \color{limegreen}{a_{n,i}} \geq c_{n,\delta} \right\}\,.\]
 					</p>
+					<p class="fragment" data-fragment-index="5"></p>
 					</div>
 				</section>
-				<section>
+				<section style="font-size: 75%">
 					<header><h3>Proof sketch</h3></header>
 					<p>Sufficient condition for $\beta$-optimality</p>
 					<p class="theorem fragment" data-fragment-index="0"><strong>Lemma (Shang et al. 2020)</strong>
@@ -367,7 +368,7 @@ for n = 1, 2, ...
 				<section>
 					<header><h3>Illustrations</h3></header>
 					<p>Average stopping time</p>
-					<img data-src="images/ttts/bernoulli1.pdf" height="50">
+					<object data="images/ttts/bernoulli1.pdf" type="application/pdf" height="50%"></object>
 					<img data-src="images/ttts/bernoulli2.pdf" height="50">
 				</section>
 			</section>
