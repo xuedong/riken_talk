@@ -149,7 +149,22 @@ for n = 1, 2, ...
 	evaluate arm I1
 	update Pi_n
 						</code></pre-->
-						<figure class="fragment fade-in-then-out" data-fragment-index="1">
+						<p class="fragment fade-in-then-out" data-fragment-index="1">
+							A prior distribution $\Pi_1$ over $\Theta$, $\mu\in\Theta$
+						</p>
+						<p class="fragment fade-in-then-out" data-fragment-index="2">
+							$(Y_{1,I_1},\cdots,Y_{n-1,I_{n-1}}) → \Pi_n$
+						</p>
+						<p class="fragment fade-in-then-out" data-fragment-index="3">
+							\[
+								\pi_n(\mu') = \frac{\pi_1(\mu')L_{n-1}(\mu')}{∫_{\Theta}\pi_1(\mu'')L_{n-1}(\mu'')d\mu''}
+							\]
+							where
+							\[
+								L_{n-1}(\mu') = ∏_{l=1}^{n-1}p(Y_{l,I_l}|\mu'_{I_l})\,.
+							\]
+						</p>
+						<figure class="fragment fade-in-then-out" data-fragment-index="4">
 							<img data-src="images/ttts/ttts1.png" width="100%">
 						</figure>
 					</div>
