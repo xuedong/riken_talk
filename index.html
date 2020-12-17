@@ -623,40 +623,70 @@ for n = 1, 2, ...
 				</section>
 			</section>
 
-			<!--section>
+			<section>
 				<section id="future">
-					<h2>Future Plan at RIKEN</h2><br>
+					<h3>Future Plan at RIKEN</h3><br>
 					<br>
 				</section>
 				<section>
-					<header><h3>Beysian Learning and Reinforcement learning</h3></header>
+					<header><h6>Beysian Learning and Reinforcement learning</h6></header>
 					<ul>
 						<li class="fragment" data-fragment-index="0">The general Bayesian learning framework by <strong>Khan and Rue (2019)</strong>
 							\[
-    						\min_{q(\theta)\in\mathcal{Q}} \expectedvalue_{q(\theta)}\left[\sum_{i=1}^N\ell(y_i,f_{\theta}(\mathbf{x}_i))\right] + \operatorname{KL}[q(\theta),p(\theta)]
+    						\min_{q(\theta)\in\mathcal{Q}} \expectedvalue_{q(\theta)}\left[\ell(\theta))\right] - \mathcal{H}(q)\,.
 							\]
 						</li>
-						<li class="fragment" data-fragment-index="1">Link to RL (in particular policy-based methods like A2C, PPO, etc)</li>
-						<li class="fragment" data-fragment-index="2">Software: <a href="https://github.com/rlberry-py/rlberry">rlberry</a></li>
-						<li class="fragment" data-fragment-index="3">(Maybe Bayesian-flavored exploration for RL, but this is another story)</li>
+						<div class="r-stack">
+						<li class="fragment fade-in-then-out" data-fragment-index="1">Link to RL (in particular policy-based methods like A2C, PPO, etc)</li>
+						<ul class="fragment" data-fragment-index="2">
+							<li> Environment $\rightarrow M = (\mathcal{S}, \mathcal{A}, P, R)$</li>
+							<li> <b>Stochastic policies</b> $\{\pi_\theta\}_{\theta\in\Theta}$.</li>
+							<li>
+							\[
+								\theta^\star = \operatorname{arg\,max} \expectedvalue_{\pi_\theta}\left[ \sum_{t=0}^\infty \gamma^t r(s_t, a_t) \middle| s_0 \sim \rho \right]
+							\]
+							</li>
+						</ul>
+						</div>
 					</ul>
 				</section>
 				<section>
-					<header><h3>Online Approximate Bayesian Inference</h3></header>
+					<header><h6>RL as Inference</h6></header>
+					<ul>
+						<li class="fragment" data-fragment-index="0">PGM s.t. infer $p(a_t|s_t,\theta) = \pi_{\theta}(a_t|s_t) →$ optimal policy (see <strong>Levine, 2018</strong> for a survey)</li>
+						<li class="fragment" data-fragment-index="1">Introduce an additional binary random variable $\mathcal{O}_t$
+							\[
+								p(\mathcal{O}_t=1|s_t,a_t) = \exp(r(s_t,a_t)) → p(a_t|s_t,\mathcal{O}_{t:T})\,.
+							\]
+						</li>
+						<li class="fragment" data-fragment-index="2">It is sufficient to compute
+							\[
+								\beta_t(s_t,a_t) = p(\mathcal{O}_{t:T}|s_t,a_t)\,,
+							\]
+							and
+							\[
+								\beta_t(s_t) = p(\mathcal{O}_{t:T}|s_t) = ∫_{\mathcal{A}}\beta_t(s_t,a_t)p(a_t|s_t)\,.
+							\]
+						</li>
+					</ul>
+				</section>
+				<section>
+					<header><h6>Online Approximate Bayesian Inference</h6></header>
 					<ul>
 						<li class="fragment" data-fragment-index="0">Theoretical groundings for online Bayesian inference algorithms</li>
 						<li class="fragment" data-fragment-index="1">e.g. generalization bound for online VI <strong>(Chérief-Abdellatif, Alquier and Khan, 2020)</strong></li>
 					</ul>
 				</section>
 				<section>
-					<header><h3>Direct Follow-ups and Other Perspectives</h3></header>
+					<header><h6>Direct Follow-ups and Other Perspectives</h6></header>
 					<ul>
-						<li class="fragment" data-fragment-index="0">BAI for linear bandits using Bayesian machineries</li>
-						<li class="fragment" data-fragment-index="1">Bandits/Bayesian optimization for AutoML</li>
-						<li class="fragment" data-fragment-index="2">Fairness and safety constraints</li>
+						<li class="fragment" data-fragment-index="0">Software: <a href="https://github.com/rlberry-py/rlberry">rlberry</a></li>
+						<li class="fragment" data-fragment-index="1">BAI for linear bandits using Bayesian machineries</li>
+						<li class="fragment" data-fragment-index="2">Bandits/Bayesian optimization for AutoML</li>
+						<li class="fragment" data-fragment-index="3">Fairness and safety constraints</li>
 					</ul>
 				</section>
-			</section-->
+			</section>
 		</div>
 	</div>
 
